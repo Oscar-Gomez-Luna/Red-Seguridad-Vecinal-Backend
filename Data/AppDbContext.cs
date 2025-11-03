@@ -33,27 +33,28 @@ namespace MiApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
-            // Configurar precisión para campos decimales
             ConfigureDecimalPrecision(modelBuilder);
 
-            // CONFIGURACIONES PARA EVITAR CICLOS DE CASCADA
+            modelBuilder.Entity<CargoMantenimiento>()
+                .Property(c => c.SaldoPendiente)
+                .HasComputedColumnSql("[Monto] - [MontoPagado]", stored: true);
 
-            // Para CargosServicios - Cambiar a Restrict o No Action
+            modelBuilder.Entity<CargoServicio>()
+                .Property(c => c.SaldoPendiente)
+                .HasComputedColumnSql("[Monto] - [MontoPagado]", stored: true);
+
             modelBuilder.Entity<CargoServicio>()
                 .HasOne(c => c.Usuario)
                 .WithMany(u => u.CargosServicios)
                 .HasForeignKey(c => c.UsuarioID)
-                .OnDelete(DeleteBehavior.Restrict); // Cambiar de Cascade a Restrict
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CargoServicio>()
                 .HasOne(c => c.Solicitud)
                 .WithMany(s => s.CargosServicios)
                 .HasForeignKey(c => c.SolicitudID)
-                .OnDelete(DeleteBehavior.Restrict); // Cambiar de Cascade a Restrict
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Para otras relaciones que puedan causar problemas
             modelBuilder.Entity<CargoMantenimiento>()
                 .HasOne(c => c.Usuario)
                 .WithMany(u => u.CargosMantenimiento)
@@ -84,7 +85,6 @@ namespace MiApi.Data
                 .HasForeignKey(p => p.CargoMantenimientoID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // El resto de tus configuraciones de índices únicos...
             modelBuilder.Entity<TipoUsuario>()
                 .HasIndex(t => t.Nombre)
                 .IsUnique();
@@ -116,6 +116,8 @@ namespace MiApi.Data
             modelBuilder.Entity<Pago>()
                 .HasIndex(p => p.FolioUnico)
                 .IsUnique();
+
+            base.OnModelCreating(modelBuilder);
         }
 
         private void ConfigureDecimalPrecision(ModelBuilder modelBuilder)
