@@ -11,6 +11,8 @@ public class Pago
 
     public int? CargoMantenimientoID { get; set; }
 
+    public int? CargoServicioID { get; set; }
+
     [Required]
     [StringLength(50)]
     public string FolioUnico { get; set; } = string.Empty;
@@ -31,12 +33,16 @@ public class Pago
     [StringLength(4)]
     public string? UltimosDigitosTarjeta { get; set; }
 
-    // Navigation properties
     [ForeignKey("UsuarioID")]
     public virtual Usuario Usuario { get; set; } = null!;
 
     [ForeignKey("CargoMantenimientoID")]
     public virtual CargoMantenimiento? CargoMantenimiento { get; set; }
 
+    [ForeignKey("CargoServicioID")]
+    public virtual CargoServicio? CargoServicio { get; set; }
+
     public virtual ICollection<DetallePago> DetallesPago { get; set; } = new List<DetallePago>();
+
+    public virtual ComprobantePago? Comprobante { get; set; }
 }

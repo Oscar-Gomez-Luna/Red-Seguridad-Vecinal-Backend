@@ -226,7 +226,7 @@ namespace Backend_RSV.Controllers.Usuarios
             });
         }
 
-        [HttpGet("/api/tipos-usuario")]
+        [HttpGet("tipos-usuario")]
         public async Task<IActionResult> GetTiposUsuario()
         {
             var tipos = await _usuariosData.GetTiposUsuarioAsync();

@@ -1,3 +1,5 @@
+using Backend_RSV.Controllers.Pagos;
+using Backend_RSV.Data.Avisos;
 using Backend_RSV.Data.Usuarios;
 using MiApi.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +16,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL")));
 
 builder.Services.AddScoped<UsuariosData>();
+builder.Services.AddScoped<AvisosData>();
+builder.Services.AddScoped<PagosData>();
 
 Backend_RSV.Config.FirebaseInitializer.Initialize();
 
