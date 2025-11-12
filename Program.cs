@@ -6,6 +6,7 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using System.IO;
 using Backend_RSV.Data.Reportes;
+using Backend_RSV.Data.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +43,7 @@ else
 builder.Services.AddScoped<AlertaPanicoData>();
 builder.Services.AddScoped<FirebaseNotificationService>();
 builder.Services.AddScoped<ReporteData>();
-
+builder.Services.AddScoped<ServiciosData>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
