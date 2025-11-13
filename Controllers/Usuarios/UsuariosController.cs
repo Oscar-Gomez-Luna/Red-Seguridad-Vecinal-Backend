@@ -71,6 +71,7 @@ namespace Backend_RSV.Controllers.Usuarios
                     numeroCasa = usuario.NumeroCasa,
                     calle = usuario.Calle,
                     tipoUsuario = usuario.TipoUsuario.Nombre,
+                    descripcion = usuario.TipoUsuario.Descripcion,
                     firebaseID = firebaseUID
                 });
             }

@@ -23,7 +23,7 @@ namespace Backend_RSV.Data.Usuarios
             return await _context.Usuarios
                 .Include(u => u.Persona)
                 .Include(u => u.TipoUsuario)
-                .FirstOrDefaultAsync(u => u.FirebaseUID == firebaseUID);
+                .FirstOrDefaultAsync(u => u.FirebaseUID == firebaseUID && u.Activo);
         }
         public async Task<Usuario> RegistrarUsuarioAsync(Persona persona, Usuario usuario, CuentaUsuario cuentaUsuario)
         {
