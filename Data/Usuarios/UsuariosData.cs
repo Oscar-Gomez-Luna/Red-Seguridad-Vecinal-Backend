@@ -122,7 +122,12 @@ namespace Backend_RSV.Data.Usuarios
             if (usuario.CuentaUsuario != null)
             {
                 usuario.CuentaUsuario.NumeroTarjeta = System.Text.Encoding.UTF8.GetBytes(request.NumeroTarjeta);
-                usuario.CuentaUsuario.UltimosDigitos = request.UltimosDigitos;
+
+                string ultimos4 = request.NumeroTarjeta.Length >= 4
+                    ? request.NumeroTarjeta[^4..]
+                    : request.NumeroTarjeta;
+
+                usuario.CuentaUsuario.UltimosDigitos = ultimos4;
                 usuario.CuentaUsuario.FechaVencimiento = request.FechaVencimiento;
                 usuario.CuentaUsuario.UltimaActualizacion = DateTime.Now;
             }

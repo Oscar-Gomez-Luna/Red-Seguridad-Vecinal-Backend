@@ -13,7 +13,6 @@ namespace Backend_RSV.Models.Request
         public string Email { get; set; } = string.Empty;
         public string? Password { get; set; }
         public string NumeroTarjeta { get; set; } = string.Empty;
-        public string UltimosDigitos { get; set; } = string.Empty;
         public string FechaVencimiento { get; set; } = string.Empty;
     }
 }

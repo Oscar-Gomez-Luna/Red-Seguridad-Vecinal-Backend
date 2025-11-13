@@ -1,6 +1,6 @@
 using Backend_RSV.Data.Mapa;
+using Backend_RSV.Models.Request;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Backend_RSV.Controllers.Mapa
 {
@@ -33,26 +33,39 @@ namespace Backend_RSV.Controllers.Mapa
         }
 
         [HttpPost("marcadores")]
-        public async Task<IActionResult> CrearMarcador([FromBody] MarcadorMapa marcador)
+        public async Task<IActionResult> CrearMarcador([FromBody] MarcadorMapaRegisterRequest request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var marcador = new MarcadorMapa
+            {
+                UsuarioID = request.UsuarioID,
+                Latitud = request.Latitud,
+                Longitud = request.Longitud,
+                Indicador = request.Indicador,
+                Comentario = request.Comentario,
+                FechaCreacion = DateTime.Now
+            };
 
             var nuevo = await _mapaData.CrearMarcadorAsync(marcador);
-            return CreatedAtAction(nameof(GetMarcador), new { id = nuevo.MarcadorID }, nuevo);
+            return Ok(nuevo);
         }
 
-        [HttpPut("marcadores/{id}")]
-        public async Task<IActionResult> ActualizarMarcador(int id, [FromBody] MarcadorMapa marcador)
+        [HttpPut("marcadores")]
+        public async Task<IActionResult> ActualizarMarcador([FromBody] MarcadorMapaUpdateRequest request)
         {
-            if (id != marcador.MarcadorID)
-                return BadRequest(new { message = "El ID no coincide." });
+            var marcador = new MarcadorMapa
+            {
+                MarcadorID = request.MarcadorID,
+                Latitud = request.Latitud,
+                Longitud = request.Longitud,
+                Indicador = request.Indicador,
+                Comentario = request.Comentario
+            };
 
             var actualizado = await _mapaData.ActualizarMarcadorAsync(marcador);
             if (!actualizado)
-                return NotFound(new { message = "Marcador no encontrado." });
+                return NotFound();
 
-            return Ok(new { message = "Marcador actualizado correctamente." });
+            return NoContent();
         }
 
         [HttpDelete("marcadores/{id}")]
