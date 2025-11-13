@@ -26,11 +26,8 @@ namespace Backend_RSV.Controllers.Avisos
                 a.Descripcion,
                 a.FechaEvento,
                 a.FechaPublicacion,
-                a.Usuario.UsuarioID,
-                nombrePersona = a.Usuario.Persona.Nombre,
-                apellidoP = a.Usuario.Persona.ApellidoPaterno,
-                apellidoM = a.Usuario.Persona.ApellidoMaterno,
-                categoria = a.Categoria.Nombre
+                a.Usuario,
+                a.Categoria
             });
 
             return Ok(result);
@@ -49,10 +46,8 @@ namespace Backend_RSV.Controllers.Avisos
                 aviso.Descripcion,
                 aviso.FechaEvento,
                 aviso.FechaPublicacion,
-                nombrePersona = aviso.Usuario.Persona.Nombre,
-                apellidoP = aviso.Usuario.Persona.ApellidoPaterno,
-                apellidoM = aviso.Usuario.Persona.ApellidoMaterno,
-                categoria = aviso.Categoria.Nombre
+                aviso.Usuario,
+                aviso.Categoria
             });
         }
 
