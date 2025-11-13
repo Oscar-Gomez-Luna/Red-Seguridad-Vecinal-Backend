@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Backend_RSV.Data.Avisos;
+using Backend_RSV.Models.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_RSV.Controllers.Avisos
@@ -55,19 +52,18 @@ namespace Backend_RSV.Controllers.Avisos
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAviso([FromBody] Aviso aviso)
+        public async Task<IActionResult> CreateAviso([FromBody] AvisoRegistroRequest aviso)
         {
             var nuevoAviso = await _avisosData.AddAsync(aviso);
             return CreatedAtAction(nameof(GetAviso), new { id = nuevoAviso.AvisoID }, nuevoAviso);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAviso(int id, [FromBody] Aviso aviso)
+        [HttpPut]
+        public async Task<IActionResult> UpdateAviso([FromBody] AvisoUpdateRequest aviso)
         {
-            if (id != aviso.AvisoID) return BadRequest();
-
-            var actualizado = await _avisosData.UpdateAsync(aviso);
-            if (actualizado == null) return NotFound(new { message = "Aviso no encontrado." });
+            var actualizado = await _avisosData.UpdateAsync(aviso.AvisoID, aviso);
+            if (actualizado == null)
+                return NotFound();
 
             return Ok(actualizado);
         }

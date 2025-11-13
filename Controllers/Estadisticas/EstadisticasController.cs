@@ -5,6 +5,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace Backend_RSV.Controllers.Estadisticas
 {
@@ -63,8 +64,9 @@ namespace Backend_RSV.Controllers.Estadisticas
         [HttpGet("exportar")]
         public async Task<IActionResult> ExportarEstadisticas([FromQuery] string tipo = "pdf")
         {
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
             var datos = await _estadisticasData.ObtenerEstadisticasGeneralesAsync();
-
+            var opcionesJson = new JsonSerializerOptions { WriteIndented = true };
             if (tipo.Equals("pdf", StringComparison.OrdinalIgnoreCase))
             {
                 var stream = new MemoryStream();
@@ -83,19 +85,22 @@ namespace Backend_RSV.Controllers.Estadisticas
                         page.Content().PaddingVertical(10).Column(col =>
                         {
                             col.Item().Text("Estadísticas de Incidentes").FontSize(16).Bold();
-                            col.Item().Text(datos?.Incidentes?.ToString()).FontSize(12);
+                            col.Item().Text(JsonSerializer.Serialize(datos?.Incidentes, opcionesJson))
+                                .FontSize(10);
 
                             col.Spacing(10);
                             col.Item().LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
 
                             col.Item().Text("Estadísticas de Pagos").FontSize(16).Bold();
-                            col.Item().Text(datos?.Pagos?.ToString()).FontSize(12);
+                            col.Item().Text(JsonSerializer.Serialize(datos?.Pagos, opcionesJson))
+                                .FontSize(10);
 
                             col.Spacing(10);
                             col.Item().LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
 
                             col.Item().Text("Estadísticas de Servicios").FontSize(16).Bold();
-                            col.Item().Text(datos?.Servicios?.ToString()).FontSize(12);
+                            col.Item().Text(JsonSerializer.Serialize(datos?.Servicios, opcionesJson))
+                                .FontSize(10);
                         });
 
                         page.Footer()
@@ -111,20 +116,20 @@ namespace Backend_RSV.Controllers.Estadisticas
             {
                 using var workbook = new XLWorkbook();
 
-                // Hoja 1: Incidentes
                 var hoja1 = workbook.Worksheets.Add("Incidentes");
                 hoja1.Cell(1, 1).Value = "Estadísticas de Incidentes";
-                hoja1.Cell(2, 1).Value = datos?.Incidentes?.ToString();
+                hoja1.Cell(2, 1).Value = JsonSerializer.Serialize(datos?.Incidentes, opcionesJson);
+                hoja1.Columns().AdjustToContents();
 
-                // Hoja 2: Pagos
                 var hoja2 = workbook.Worksheets.Add("Pagos");
                 hoja2.Cell(1, 1).Value = "Estadísticas de Pagos";
-                hoja2.Cell(2, 1).Value = datos?.Pagos?.ToString();
+                hoja2.Cell(2, 1).Value = JsonSerializer.Serialize(datos?.Pagos, opcionesJson);
+                hoja2.Columns().AdjustToContents();
 
-                // Hoja 3: Servicios
                 var hoja3 = workbook.Worksheets.Add("Servicios");
                 hoja3.Cell(1, 1).Value = "Estadísticas de Servicios";
-                hoja3.Cell(2, 1).Value = datos?.Servicios?.ToString();
+                hoja3.Cell(2, 1).Value = JsonSerializer.Serialize(datos?.Servicios, opcionesJson);
+                hoja3.Columns().AdjustToContents();
 
                 using var stream = new MemoryStream();
                 workbook.SaveAs(stream);

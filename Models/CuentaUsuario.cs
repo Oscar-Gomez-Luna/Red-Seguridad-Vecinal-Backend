@@ -17,7 +17,7 @@ public class CuentaUsuario
     public string UltimosDigitos { get; set; } = string.Empty;
 
     [Required]
-    public DateOnly FechaVencimiento { get; set; }
+    public string FechaVencimiento { get; set; } = string.Empty;
 
     [Column(TypeName = "decimal(10,2)")]
     public decimal SaldoMantenimiento { get; set; } = 0.00m;

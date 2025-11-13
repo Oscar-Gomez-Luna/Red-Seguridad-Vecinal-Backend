@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FirebaseAdmin.Auth;
+using Backend_RSV.Models.Request;
 using MiApi.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,25 +30,36 @@ namespace Backend_RSV.Data.Avisos
                 .FirstOrDefaultAsync(a => a.AvisoID == id);
         }
 
-        public async Task<Aviso> AddAsync(Aviso aviso)
+        public async Task<Aviso> AddAsync(AvisoRegistroRequest request)
         {
+            var aviso = new Aviso
+            {
+                UsuarioID = request.UsuarioID,
+                CategoriaID = request.CategoriaID,
+                Titulo = request.Titulo,
+                Descripcion = request.Descripcion,
+                FechaEvento = request.FechaEvento,
+                FechaPublicacion = DateTime.Now
+            };
+
             _context.Avisos.Add(aviso);
             await _context.SaveChangesAsync();
             return aviso;
         }
 
-        public async Task<Aviso?> UpdateAsync(Aviso aviso)
+        public async Task<Aviso?> UpdateAsync(int id, AvisoUpdateRequest request)
         {
-            var existing = await _context.Avisos.FindAsync(aviso.AvisoID);
-            if (existing == null) return null;
+            var aviso = await _context.Avisos.FindAsync(id);
+            if (aviso == null)
+                return null;
 
-            existing.Titulo = aviso.Titulo;
-            existing.Descripcion = aviso.Descripcion;
-            existing.FechaEvento = aviso.FechaEvento;
-            existing.CategoriaID = aviso.CategoriaID;
+            aviso.CategoriaID = request.CategoriaID;
+            aviso.Titulo = request.Titulo;
+            aviso.Descripcion = request.Descripcion;
+            aviso.FechaEvento = request.FechaEvento;
 
             await _context.SaveChangesAsync();
-            return existing;
+            return aviso;
         }
 
         public async Task<bool> DeleteAsync(int id)

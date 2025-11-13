@@ -1,4 +1,4 @@
-using Backend_RSV.Models;
+using Backend_RSV.Models.Request;
 using MiApi.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +26,8 @@ namespace Backend_RSV.Data.Estadisticas
                 })
                 .ToListAsync();
 
-            var porMes = await _context.Reportes
+            var porMes = _context.Reportes
+                .AsEnumerable()
                 .GroupBy(r => new { r.FechaCreacion.Year, r.FechaCreacion.Month })
                 .Select(g => new
                 {
@@ -34,7 +35,7 @@ namespace Backend_RSV.Data.Estadisticas
                     Total = g.Count()
                 })
                 .OrderBy(g => g.Mes)
-                .ToListAsync();
+                .ToList();
 
             var anonimos = await _context.Reportes.CountAsync(r => r.EsAnonimo);
             var vistos = await _context.Reportes.CountAsync(r => r.Visto);
@@ -50,6 +51,7 @@ namespace Backend_RSV.Data.Estadisticas
                 NoVistos = totalReportes - vistos
             };
         }
+
         public async Task<object> ObtenerEstadisticasPagosAsync()
         {
             var totalPagos = await _context.Pagos.CountAsync();
@@ -74,7 +76,8 @@ namespace Backend_RSV.Data.Estadisticas
                 })
                 .ToListAsync();
 
-            var porMes = await _context.Pagos
+            var porMes = _context.Pagos
+                .AsEnumerable()
                 .GroupBy(p => new { p.FechaPago.Year, p.FechaPago.Month })
                 .Select(g => new
                 {
@@ -83,7 +86,7 @@ namespace Backend_RSV.Data.Estadisticas
                     MontoTotal = g.Sum(p => p.MontoTotal)
                 })
                 .OrderBy(g => g.Mes)
-                .ToListAsync();
+                .ToList();
 
             var adeudosServicios = await _context.CargosServicios
                 .Where(c => c.Estado == "Pendiente")
@@ -131,15 +134,16 @@ namespace Backend_RSV.Data.Estadisticas
                 })
                 .ToListAsync();
 
-            var porMes = await _context.CargosServicios
-                .GroupBy(c => new { c.FechaCreacion.Year, c.FechaCreacion.Month })
-                .Select(g => new
-                {
-                    Mes = $"{g.Key.Month:D2}/{g.Key.Year}",
-                    TotalSolicitudes = g.Count()
-                })
-                .OrderBy(g => g.Mes)
-                .ToListAsync();
+            var porMes = _context.CargosServicios
+               .AsEnumerable()
+               .GroupBy(c => new { c.FechaCreacion.Year, c.FechaCreacion.Month })
+               .Select(g => new
+               {
+                   Mes = $"{g.Key.Month:D2}/{g.Key.Year}",
+                   TotalSolicitudes = g.Count()
+               })
+               .OrderBy(g => g.Mes)
+               .ToList();
 
             var totalCompletados = await _context.ServiciosCatalogo.SumAsync(s => s.NumeroServiciosCompletados);
 
@@ -157,26 +161,16 @@ namespace Backend_RSV.Data.Estadisticas
         public async Task<object> ObtenerEstadisticasPorTipoAsync(string tipo = "todo", DateTime? desde = null, DateTime? hasta = null)
         {
             tipo = tipo?.ToLower() ?? "todo";
-
             var resultado = new Dictionary<string, object>();
 
             if (tipo == "incidentes" || tipo == "todo")
-            {
-                var incidentes = await ObtenerEstadisticasIncidentesAsync();
-                resultado["incidentes"] = incidentes;
-            }
+                resultado["incidentes"] = await ObtenerEstadisticasIncidentesAsync();
 
             if (tipo == "pagos" || tipo == "todo")
-            {
-                var pagos = await ObtenerEstadisticasPagosAsync();
-                resultado["pagos"] = pagos;
-            }
+                resultado["pagos"] = await ObtenerEstadisticasPagosAsync();
 
             if (tipo == "servicios" || tipo == "todo")
-            {
-                var servicios = await ObtenerEstadisticasServiciosAsync();
-                resultado["servicios"] = servicios;
-            }
+                resultado["servicios"] = await ObtenerEstadisticasServiciosAsync();
 
             return resultado;
         }

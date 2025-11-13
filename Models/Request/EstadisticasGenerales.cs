@@ -1,4 +1,4 @@
-namespace Backend_RSV.Models
+namespace Backend_RSV.Models.Request
 {
     public class EstadisticasGenerales
     {

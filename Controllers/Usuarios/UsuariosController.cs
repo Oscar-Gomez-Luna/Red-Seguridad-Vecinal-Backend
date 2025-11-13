@@ -2,8 +2,8 @@ using System.Text;
 using System.Text.Json;
 using Backend_RSV.Data.Usuarios;
 using FirebaseAdmin.Auth;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
+using Backend_RSV.Models.Request;
 
 namespace Backend_RSV.Controllers.Usuarios
 {
@@ -82,7 +82,7 @@ namespace Backend_RSV.Controllers.Usuarios
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Registrar([FromBody] RegistroRequest request)
+        public async Task<IActionResult> Registrar([FromBody] RegistroUsuarioRequest request)
         {
             if (request == null)
                 return BadRequest("Datos incompletos.");
@@ -250,27 +250,5 @@ namespace Backend_RSV.Controllers.Usuarios
                 t.Descripcion
             }));
         }
-    }
-
-    public class LoginRequest
-    {
-        public string? Email { get; set; }
-        public string? Password { get; set; }
-    }
-
-    public class RegistroRequest
-    {
-        public int TipoUsuarioID { get; set; }
-        public string? NumeroCasa { get; set; }
-        public string? Calle { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-        public string ApellidoPaterno { get; set; } = string.Empty;
-        public string? ApellidoMaterno { get; set; }
-        public string? Telefono { get; set; }
-        public DateOnly? FechaNacimiento { get; set; }
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string NumeroTarjeta { get; set; } = string.Empty;
-        public DateOnly FechaVencimiento { get; set; }
     }
 }
