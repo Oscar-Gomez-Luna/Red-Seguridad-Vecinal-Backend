@@ -14,13 +14,21 @@ namespace Backend_RSV.Data.Usuarios
             _context = context;
         }
 
-        // Método para obtener un usuario según su FirebaseUID
         public async Task<Usuario?> LoginAsync(string firebaseUID)
         {
-            return await _context.Usuarios
+            var usuario = await _context.Usuarios
                 .Include(u => u.Persona)
                 .Include(u => u.TipoUsuario)
                 .FirstOrDefaultAsync(u => u.FirebaseUID == firebaseUID && u.Activo);
+
+            if (usuario != null)
+            {
+                usuario.UltimoAcceso = DateTime.Now;
+                _context.Usuarios.Update(usuario);
+                await _context.SaveChangesAsync();
+            }
+
+            return usuario;
         }
         public async Task<Usuario> RegistrarUsuarioAsync(Persona persona, Usuario usuario, CuentaUsuario cuentaUsuario)
         {
