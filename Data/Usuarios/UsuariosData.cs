@@ -160,5 +160,19 @@ namespace Backend_RSV.Data.Usuarios
         {
             return await _context.TiposUsuario.ToListAsync();
         }
+        public async Task<List<CuentaUsuario>> GetAllAsync()
+        {
+            return await _context.CuentaUsuario
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<CuentaUsuario?> GetByUsuarioIdAsync(int usuarioId)
+        {
+            return await _context.CuentaUsuario
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.UsuarioID == usuarioId);
+        }
+
     }
 }

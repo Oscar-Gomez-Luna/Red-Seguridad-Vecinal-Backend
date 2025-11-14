@@ -1,6 +1,7 @@
 using Backend_RSV.Data.Avisos;
 using Backend_RSV.Models.Request;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend_RSV.Controllers.Avisos
 {
@@ -36,8 +37,53 @@ namespace Backend_RSV.Controllers.Avisos
         [HttpPost]
         public async Task<IActionResult> CreateAviso([FromBody] AvisoRegistroRequest aviso)
         {
-            var nuevoAviso = await _avisosData.AddAsync(aviso);
-            return CreatedAtAction(nameof(GetAviso), new { id = nuevoAviso.AvisoID }, nuevoAviso);
+            try
+            {
+                if (aviso == null)
+                    return BadRequest(new { mensaje = "El cuerpo de la solicitud es inválido." });
+
+                if (string.IsNullOrWhiteSpace(aviso.Titulo))
+                    return BadRequest(new { mensaje = "El título es obligatorio." });
+
+                if (string.IsNullOrWhiteSpace(aviso.Descripcion))
+                    return BadRequest(new { mensaje = "La descripción es obligatoria." });
+
+                if (aviso.UsuarioID <= 0)
+                    return BadRequest(new { mensaje = "El UsuarioID es inválido." });
+
+                if (aviso.CategoriaID <= 0)
+                    return BadRequest(new { mensaje = "El CategoriaID es inválido." });
+
+                var nuevoAviso = await _avisosData.AddAsync(aviso);
+
+                var response = new
+                {
+                    nuevoAviso.AvisoID,
+                    aviso.UsuarioID,
+                    aviso.CategoriaID,
+                    aviso.Titulo,
+                    aviso.Descripcion,
+                    aviso.FechaEvento
+                };
+
+                return Ok(response);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return StatusCode(500, new
+                {
+                    mensaje = "Ocurrió un error al guardar el aviso en la base de datos.",
+                    detalle = dbEx.InnerException?.Message ?? dbEx.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    mensaje = "Ocurrió un error inesperado.",
+                    detalle = ex.Message
+                });
+            }
         }
 
         [HttpPut]

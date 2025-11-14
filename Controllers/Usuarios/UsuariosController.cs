@@ -256,5 +256,48 @@ namespace Backend_RSV.Controllers.Usuarios
                 t.Descripcion
             }));
         }
+        [HttpGet("cuentas-usuario")]
+        public async Task<IActionResult> GetAll()
+        {
+            var cuentas = await _usuariosData.GetAllAsync();
+            var response = cuentas.Select(c => new
+            {
+                c.CuentaID,
+                c.UsuarioID,
+                c.NumeroTarjeta,
+                c.UltimosDigitos,
+                c.FechaVencimiento,
+                c.SaldoMantenimiento,
+                c.SaldoServicios,
+                c.SaldoTotal,
+                c.UltimaActualizacion
+            });
+
+            return Ok(response);
+        }
+
+        [HttpGet("cuenta-usuario/{usuarioId}")]
+        public async Task<IActionResult> GetById(int usuarioId)
+        {
+            var cuenta = await _usuariosData.GetByUsuarioIdAsync(usuarioId);
+
+            if (cuenta == null)
+                return NotFound(new { mensaje = "La cuenta no existe." });
+            var response = new
+            {
+                cuenta.CuentaID,
+                cuenta.UsuarioID,
+                cuenta.NumeroTarjeta,
+                cuenta.UltimosDigitos,
+                cuenta.FechaVencimiento,
+                cuenta.SaldoMantenimiento,
+                cuenta.SaldoServicios,
+                cuenta.SaldoTotal,
+                cuenta.UltimaActualizacion
+            };
+
+            return Ok(response);
+        }
+
     }
 }
