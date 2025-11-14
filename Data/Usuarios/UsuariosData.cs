@@ -121,15 +121,16 @@ namespace Backend_RSV.Data.Usuarios
 
             if (usuario.CuentaUsuario != null)
             {
-                usuario.CuentaUsuario.NumeroTarjeta = System.Text.Encoding.UTF8.GetBytes(request.NumeroTarjeta);
+                if (!string.IsNullOrEmpty(request.NumeroTarjeta))
+                {
+                    usuario.CuentaUsuario.NumeroTarjeta = System.Text.Encoding.UTF8.GetBytes(request.NumeroTarjeta);
 
-                string ultimos4 = request.NumeroTarjeta.Length >= 4
-                    ? request.NumeroTarjeta[^4..]
-                    : request.NumeroTarjeta;
+                    string ultimos4 = request.NumeroTarjeta.Length >= 4
+                        ? request.NumeroTarjeta[^4..]
+                        : request.NumeroTarjeta;
 
-                usuario.CuentaUsuario.UltimosDigitos = ultimos4;
-                usuario.CuentaUsuario.FechaVencimiento = request.FechaVencimiento;
-                usuario.CuentaUsuario.UltimaActualizacion = DateTime.Now;
+                    usuario.CuentaUsuario.UltimosDigitos = ultimos4;
+                }
             }
 
             _context.Usuarios.Update(usuario);
@@ -137,11 +138,13 @@ namespace Backend_RSV.Data.Usuarios
 
             return true;
         }
+
         public async Task<List<Usuario>> GetAllUsuariosAsync()
         {
             return await _context.Usuarios
                 .Include(u => u.Persona)
                 .Include(u => u.TipoUsuario)
+                .Include(u => u.CuentaUsuario)
                 .ToListAsync();
         }
 
@@ -150,6 +153,7 @@ namespace Backend_RSV.Data.Usuarios
             return await _context.Usuarios
                 .Include(u => u.Persona)
                 .Include(u => u.TipoUsuario)
+                .Include(u => u.CuentaUsuario)
                 .FirstOrDefaultAsync(u => u.UsuarioID == id);
         }
         public async Task<List<TipoUsuario>> GetTiposUsuarioAsync()

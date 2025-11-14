@@ -207,6 +207,9 @@ namespace Backend_RSV.Controllers.Usuarios
                 u.Persona.ApellidoMaterno,
                 u.Persona.Email,
                 tipoUsuario = u.TipoUsuario.Nombre,
+                u.CuentaUsuario?.NumeroTarjeta,
+                u.CuentaUsuario?.UltimosDigitos,
+                u.CuentaUsuario?.FechaVencimiento,
                 u.Activo
             }));
         }
@@ -231,6 +234,9 @@ namespace Backend_RSV.Controllers.Usuarios
                 tipoUsuario = usuario.TipoUsuario.Nombre,
                 usuario.NumeroCasa,
                 usuario.Calle,
+                usuario.CuentaUsuario?.NumeroTarjeta,
+                usuario.CuentaUsuario?.UltimosDigitos,
+                usuario.CuentaUsuario?.FechaVencimiento,
                 usuario.Activo
             });
         }
