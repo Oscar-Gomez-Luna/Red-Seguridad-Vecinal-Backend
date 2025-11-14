@@ -13,21 +13,45 @@ namespace Backend_RSV.Data.Avisos
             _context = context;
         }
 
-        public async Task<List<Aviso>> GetAllAsync()
+        public async Task<List<AvisosDTO>> GetAllAsync()
         {
             return await _context.Avisos
                 .Include(a => a.Categoria)
-                .Include(a => a.Usuario)
                 .OrderByDescending(a => a.FechaPublicacion)
+                .Select(a => new AvisosDTO
+                {
+                    AvisoID = a.AvisoID,
+                    UsuarioID = a.UsuarioID,
+                    CategoriaID = a.CategoriaID,
+                    Titulo = a.Titulo,
+                    Descripcion = a.Descripcion,
+                    FechaEvento = a.FechaEvento,
+                    FechaPublicacion = a.FechaPublicacion,
+                    CategoriaNombre = a.Categoria.Nombre,
+                    CategoriaActiva = a.Categoria.Activo,
+
+                })
                 .ToListAsync();
         }
-
-        public async Task<Aviso?> GetByIdAsync(int id)
+        public async Task<AvisosDTO?> GetByIdAsync(int id)
         {
             return await _context.Avisos
                 .Include(a => a.Categoria)
-                .Include(a => a.Usuario)
-                .FirstOrDefaultAsync(a => a.AvisoID == id);
+                .Where(a => a.AvisoID == id)
+                .Select(a => new AvisosDTO
+                {
+                    AvisoID = a.AvisoID,
+                    UsuarioID = a.UsuarioID,
+                    CategoriaID = a.CategoriaID,
+                    Titulo = a.Titulo,
+                    Descripcion = a.Descripcion,
+                    FechaEvento = a.FechaEvento,
+                    FechaPublicacion = a.FechaPublicacion,
+
+                    CategoriaNombre = a.Categoria.Nombre,
+                    CategoriaActiva = a.Categoria.Activo,
+                })
+                .FirstOrDefaultAsync();
         }
 
         public async Task<Aviso> AddAsync(AvisoRegistroRequest request)

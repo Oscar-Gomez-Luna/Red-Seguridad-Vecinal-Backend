@@ -19,36 +19,18 @@ namespace Backend_RSV.Controllers.Avisos
         public async Task<IActionResult> GetAvisos()
         {
             var avisos = await _avisosData.GetAllAsync();
-            var result = avisos.Select(a => new
-            {
-                a.AvisoID,
-                a.Titulo,
-                a.Descripcion,
-                a.FechaEvento,
-                a.FechaPublicacion,
-                a.Usuario,
-                a.Categoria
-            });
-
-            return Ok(result);
+            return Ok(avisos);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAviso(int id)
         {
             var aviso = await _avisosData.GetByIdAsync(id);
-            if (aviso == null) return NotFound(new { message = "Aviso no encontrado." });
 
-            return Ok(new
-            {
-                aviso.AvisoID,
-                aviso.Titulo,
-                aviso.Descripcion,
-                aviso.FechaEvento,
-                aviso.FechaPublicacion,
-                aviso.Usuario,
-                aviso.Categoria
-            });
+            if (aviso == null)
+                return NotFound(new { message = "Aviso no encontrado." });
+
+            return Ok(aviso);
         }
 
         [HttpPost]
