@@ -13,11 +13,16 @@ namespace Backend_RSV.Controllers.Alertas
     {
         private readonly AlertaPanicoData _alertasData;
         private readonly FirebaseNotificationService _firebaseService;
+        private readonly IFirebaseDataService _firebaseDataService;
 
-        public AlertasController(AlertaPanicoData alertasData, FirebaseNotificationService firebaseService)
+        public AlertasController(
+            AlertaPanicoData alertasData, 
+            FirebaseNotificationService firebaseService,
+            IFirebaseDataService firebaseDataService)
         {
             _alertasData = alertasData;
             _firebaseService = firebaseService;
+            _firebaseDataService = firebaseDataService;
         }
 
         // GET: api/alertas
@@ -80,12 +85,16 @@ namespace Backend_RSV.Controllers.Alertas
                 // 1. Crear alerta en MySQL
                 var alerta = await _alertasData.CreateAlertaAsync(request);
                 
-                // 2. Enviar notificación push a comité y vecinos cercanos
+                // 2. Guardar en Firebase Realtime Database
+                string firebaseId = await _firebaseDataService.GuardarAlertaEnFirebase(alerta);
+                
+                // 3. Enviar notificación push a comité y vecinos cercanos
                 await _firebaseService.SendPanicAlertNotification(alerta);
                 
                 return Ok(new { 
-                    message = "Alerta creada y notificaciones enviadas", 
-                    alertaId = alerta.AlertaID 
+                    message = "Alerta creada, guardada en Firebase y notificaciones enviadas", 
+                    alertaId = alerta.AlertaID,
+                    firebaseId = firebaseId
                 });
             }
             catch (Exception ex)
@@ -97,5 +106,48 @@ namespace Backend_RSV.Controllers.Alertas
                 });
             }
         }
+
+        // PUT: api/alertas/firebase/{firebaseId}/estatus
+        [HttpPut("firebase/{firebaseId}/estatus")]
+        public async Task<IActionResult> UpdateFirebaseEstatus(string firebaseId, [FromBody] UpdateFirebaseEstatusRequest request)
+        {
+            try
+            {
+                bool success = await _firebaseDataService.ActualizarEstatusAlerta(firebaseId, request.Estatus);
+                
+                if (success)
+                    return Ok(new { message = "Estatus actualizado en Firebase" });
+                else
+                    return StatusCode(500, new { message = "Error al actualizar estatus en Firebase" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al actualizar estatus", error = ex.Message });
+            }
+        }
+
+        // DELETE: api/alertas/firebase/{firebaseId}
+        [HttpDelete("firebase/{firebaseId}")]
+        public async Task<IActionResult> DeleteAlertaFirebase(string firebaseId)
+        {
+            try
+            {
+                bool success = await _firebaseDataService.EliminarAlertaFirebase(firebaseId);
+                
+                if (success)
+                    return Ok(new { message = "Alerta eliminada de Firebase" });
+                else
+                    return StatusCode(500, new { message = "Error al eliminar alerta de Firebase" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al eliminar alerta", error = ex.Message });
+            }
+        }
+    }
+
+    public class UpdateFirebaseEstatusRequest
+    {
+        public string Estatus { get; set; } = string.Empty;
     }
 }

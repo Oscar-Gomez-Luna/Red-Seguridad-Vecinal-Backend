@@ -7,6 +7,7 @@ using Google.Apis.Auth.OAuth2;
 using System.IO;
 using Backend_RSV.Data.Reportes;
 using Backend_RSV.Data.Servicios;
+using Backend_RSV.Data.Invitados;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL")));
 
 // CONFIGURAR FIREBASE
-var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), "Firebase-Credentials", "firebase-adminsdk.json");
+var firebasePath = Path.Combine(Directory.GetCurrentDirectory(),"firebase-adminsdk.json");
 if (File.Exists(firebasePath))
 {
     FirebaseApp.Create(new AppOptions()
@@ -44,6 +45,9 @@ builder.Services.AddScoped<AlertaPanicoData>();
 builder.Services.AddScoped<FirebaseNotificationService>();
 builder.Services.AddScoped<ReporteData>();
 builder.Services.AddScoped<ServiciosData>();
+builder.Services.AddScoped<IFirebaseDataService, FirebaseDataService>();
+builder.Services.AddScoped<InvitadosData>();
+builder.Services.AddScoped<QrService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
