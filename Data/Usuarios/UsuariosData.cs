@@ -131,6 +131,7 @@ namespace Backend_RSV.Data.Usuarios
 
                     usuario.CuentaUsuario.UltimosDigitos = ultimos4;
                 }
+                usuario.CuentaUsuario.FechaVencimiento = request.FechaVencimiento;
             }
 
             _context.Usuarios.Update(usuario);
