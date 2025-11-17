@@ -8,6 +8,7 @@ using System.IO;
 using Backend_RSV.Data.Reportes;
 using Backend_RSV.Data.Servicios;
 using Backend_RSV.Data.Invitados;
+using Backend_RSV.Data.Amenidades;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,24 +21,22 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
-// Database Context
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL")));
 
-// CONFIGURAR FIREBASE
-var firebasePath = Path.Combine(Directory.GetCurrentDirectory(),"firebase-adminsdk.json");
+var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), "firebase-adminsdk.json");
 if (File.Exists(firebasePath))
 {
     FirebaseApp.Create(new AppOptions()
     {
         Credential = GoogleCredential.FromFile(firebasePath),
     });
-    Console.WriteLine("✅ Firebase configurado correctamente");
+    Console.WriteLine("Firebase configurado correctamente");
 }
 else
 {
-    Console.WriteLine($"⚠️  Archivo firebase-adminsdk.json no encontrado en: {firebasePath}");
-    Console.WriteLine("⚠️  Las notificaciones funcionarán en modo simulación");
+    Console.WriteLine($"Archivo firebase-adminsdk.json no encontrado en: {firebasePath}");
+    Console.WriteLine("Las notificaciones funcionarán en modo simulación");
 }
 
 
@@ -48,9 +47,10 @@ builder.Services.AddScoped<ServiciosData>();
 builder.Services.AddScoped<IFirebaseDataService, FirebaseDataService>();
 builder.Services.AddScoped<InvitadosData>();
 builder.Services.AddScoped<QrService>();
+builder.Services.AddScoped<AmenidadesData>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     using (var scope = app.Services.CreateScope())

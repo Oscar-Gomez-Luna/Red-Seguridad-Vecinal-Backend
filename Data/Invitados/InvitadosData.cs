@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend_RSV.Models.DTO;
+using Backend_RSV.Models.Request;
 
 namespace Backend_RSV.Data.Invitados
 {
@@ -19,13 +21,8 @@ namespace Backend_RSV.Data.Invitados
             _qrService = qrService;
         }
 
-        // ==========================================
-        // INVITADOS - 🟨 ANDROID
-        // ==========================================
-
         public async Task<Invitado> CrearInvitadoAsync(CrearInvitadoRequest request)
         {
-            // SOLO CADENA DE TEXTO - NO BASE64
             var qrTexto = _qrService.GenerarQRInvitado(request.UsuarioID, request.NombreInvitado);
 
             var invitado = new Invitado
@@ -59,7 +56,7 @@ namespace Backend_RSV.Data.Invitados
                     FechaVencimiento = i.FechaVencimiento,
                     FechaEntrada = i.FechaEntrada,
                     FechaSalida = i.FechaSalida,
-                    Estado = GetEstadoInvitado(i), // ← MÉTODO ESTÁTICO
+                    Estado = GetEstadoInvitado(i),
                     CodigoQR = i.CodigoQR
                 })
                 .ToListAsync();
@@ -106,10 +103,6 @@ namespace Backend_RSV.Data.Invitados
                 .ToListAsync();
         }
 
-        // ==========================================
-        // ACCESOS - 🟦 PWA
-        // ==========================================
-
         public async Task<ValidacionQRResult> ValidarQRAsync(string codigoQR)
         {
             try
@@ -146,16 +139,15 @@ namespace Backend_RSV.Data.Invitados
             if (DateTime.Now > invitado.FechaVencimiento)
                 return new ValidacionQRResult { Exitoso = false, Mensaje = "QR expirado" };
 
-            // Lógica de entrada/salida
             if (invitado.FechaEntrada == null)
             {
                 // PRIMER USO - ENTRADA
                 invitado.FechaEntrada = DateTime.Now;
                 await _context.SaveChangesAsync();
 
-                return new ValidacionQRResult 
-                { 
-                    Exitoso = true, 
+                return new ValidacionQRResult
+                {
+                    Exitoso = true,
                     Mensaje = "Entrada registrada exitosamente",
                     Tipo = "Invitado",
                     Nombre = $"{invitado.NombreInvitado} {invitado.ApellidoPaternoInvitado}",
@@ -164,15 +156,14 @@ namespace Backend_RSV.Data.Invitados
             }
             else if (invitado.FechaSalida == null)
             {
-                // SEGUNDO USO - SALIDA
                 invitado.FechaSalida = DateTime.Now;
                 await _context.SaveChangesAsync();
 
-                return new ValidacionQRResult 
-                { 
-                    Exitoso = true, 
+                return new ValidacionQRResult
+                {
+                    Exitoso = true,
                     Mensaje = "Salida registrada exitosamente",
-                    Tipo = "Invitado", 
+                    Tipo = "Invitado",
                     Nombre = $"{invitado.NombreInvitado} {invitado.ApellidoPaternoInvitado}",
                     EsEntrada = false
                 };
@@ -199,9 +190,9 @@ namespace Backend_RSV.Data.Invitados
             if (DateTime.Now > qrPersonal.FechaVencimiento)
                 return new ValidacionQRResult { Exitoso = false, Mensaje = "QR personal expirado" };
 
-            return new ValidacionQRResult 
-            { 
-                Exitoso = true, 
+            return new ValidacionQRResult
+            {
+                Exitoso = true,
                 Mensaje = "Acceso permitido",
                 Tipo = "Personal",
                 Nombre = $"{qrPersonal.Usuario.Persona.Nombre} {qrPersonal.Usuario.Persona.ApellidoPaterno}",
@@ -267,13 +258,8 @@ namespace Backend_RSV.Data.Invitados
                 .ToListAsync();
         }
 
-        // ==========================================
-        // QR PERSONAL - 🟨 ANDROID & 🟦 PWA
-        // ==========================================
-
         public async Task<QRPersonal> GenerarQRPersonalAsync(int usuarioId)
         {
-            // Desactivar QR anteriores del usuario
             var qrsAnteriores = await _context.QRPersonales
                 .Where(q => q.UsuarioID == usuarioId && q.Activo)
                 .ToListAsync();
@@ -283,13 +269,12 @@ namespace Backend_RSV.Data.Invitados
                 qr.Activo = false;
             }
 
-            // SOLO CADENA DE TEXTO - NO BASE64
             var qrTexto = _qrService.GenerarQRPersonal(usuarioId);
 
             var qrPersonal = new QRPersonal
             {
                 UsuarioID = usuarioId,
-                CodigoQR = qrTexto, // ← SOLO TEXTO
+                CodigoQR = qrTexto,
                 FechaGeneracion = DateTime.Now,
                 FechaVencimiento = DateTime.Now.AddYears(1),
                 Activo = true
@@ -328,12 +313,6 @@ namespace Backend_RSV.Data.Invitados
 
             return true;
         }
-
-        // ==========================================
-        // MÉTODOS AUXILIARES - CORREGIDOS
-        // ==========================================
-
-        // MÉTODO CORREGIDO - AHORA ES ESTÁTICO
         private static string GetEstadoInvitado(Invitado invitado)
         {
             if (invitado.FechaSalida != null) return "Completado";
@@ -341,65 +320,5 @@ namespace Backend_RSV.Data.Invitados
             if (DateTime.Now > invitado.FechaVencimiento) return "Expirado";
             return "Pendiente";
         }
-    }
-
-    // ==========================================
-    // DTOs
-    // ==========================================
-
-    public class InvitadoDTO
-    {
-        public int InvitadoID { get; set; }
-        public string NombreInvitado { get; set; } = string.Empty;
-        public string ApellidoPaternoInvitado { get; set; } = string.Empty;
-        public string ApellidoMaternoInvitado { get; set; } = string.Empty;
-        public DateTime FechaGeneracion { get; set; }
-        public DateTime FechaVencimiento { get; set; }
-        public DateTime? FechaEntrada { get; set; }
-        public DateTime? FechaSalida { get; set; }
-        public string Estado { get; set; } = string.Empty;
-        public string CodigoQR { get; set; } = string.Empty;
-        public string? NombreResidente { get; set; }
-        public string? NumeroCasa { get; set; }
-    }
-
-    public class QRPersonalDTO
-    {
-        public int QRID { get; set; }
-        public int UsuarioID { get; set; }
-        public string CodigoQR { get; set; } = string.Empty;
-        public DateTime FechaGeneracion { get; set; }
-        public DateTime FechaVencimiento { get; set; }
-        public bool Activo { get; set; }
-    }
-
-    public class AccesoHistorialDTO
-    {
-        public int ID { get; set; }
-        public string Tipo { get; set; } = string.Empty;
-        public string Nombre { get; set; } = string.Empty;
-        public string Residente { get; set; } = string.Empty;
-        public DateTime FechaAcceso { get; set; }
-        public string TipoAcceso { get; set; } = string.Empty;
-        public string? NumeroCasa { get; set; }
-    }
-
-    public class ValidacionQRResult
-    {
-        public bool Exitoso { get; set; }
-        public string Mensaje { get; set; } = string.Empty;
-        public string Tipo { get; set; } = string.Empty;
-        public string Nombre { get; set; } = string.Empty;
-        public bool EsEntrada { get; set; }
-    }
-
-    // Request Models
-    public class CrearInvitadoRequest
-    {
-        public int UsuarioID { get; set; }
-        public string NombreInvitado { get; set; } = string.Empty;
-        public string ApellidoPaternoInvitado { get; set; } = string.Empty;
-        public string ApellidoMaternoInvitado { get; set; } = string.Empty;
-        public DateTime FechaVisita { get; set; }
     }
 }

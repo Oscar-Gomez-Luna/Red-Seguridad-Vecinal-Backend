@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend_RSV.Models.DTO;
+using Backend_RSV.Models.Request;
 
 namespace Backend_RSV.Data.Reportes
 {
@@ -37,9 +39,9 @@ namespace Backend_RSV.Data.Reportes
                     FechaCreacion = r.FechaCreacion,
                     Visto = r.Visto,
                     Imagen = r.Imagen,
-                    NombreUsuario = r.EsAnonimo ? "Anónimo" : 
-                                   (r.Usuario != null ? 
-                                       r.Usuario.Persona.Nombre + " " + r.Usuario.Persona.ApellidoPaterno 
+                    NombreUsuario = r.EsAnonimo ? "Anónimo" :
+                                   (r.Usuario != null ?
+                                       r.Usuario.Persona.Nombre + " " + r.Usuario.Persona.ApellidoPaterno
                                    : "Usuario"),
                     TipoReporte = r.TipoReporte.Nombre
                 })
@@ -67,11 +69,11 @@ namespace Backend_RSV.Data.Reportes
                     FechaCreacion = r.FechaCreacion,
                     Visto = r.Visto,
                     Imagen = r.Imagen,
-                    NombreCompleto = r.EsAnonimo ? "Anónimo" : 
-                                    (r.Usuario != null ? 
-                                        r.Usuario.Persona.Nombre + " " + 
-                                        r.Usuario.Persona.ApellidoPaterno + " " + 
-                                        (r.Usuario.Persona.ApellidoMaterno ?? "") 
+                    NombreCompleto = r.EsAnonimo ? "Anónimo" :
+                                    (r.Usuario != null ?
+                                        r.Usuario.Persona.Nombre + " " +
+                                        r.Usuario.Persona.ApellidoPaterno + " " +
+                                        (r.Usuario.Persona.ApellidoMaterno ?? "")
                                     : "Usuario"),
                     Email = r.EsAnonimo ? "" : (r.Usuario != null && r.Usuario.Persona != null ? r.Usuario.Persona.Email : ""),
                     Telefono = r.EsAnonimo ? "" : (r.Usuario != null && r.Usuario.Persona != null ? r.Usuario.Persona.Telefono : ""),
@@ -189,67 +191,4 @@ namespace Backend_RSV.Data.Reportes
         }
     }
 
-    // DTOs y Request classes
-    public class ReporteDTO
-    {
-        public int ReporteID { get; set; }
-        public int? UsuarioID { get; set; }
-        public int TipoReporteID { get; set; }
-        public string? Titulo { get; set; }
-        public string Descripcion { get; set; } = string.Empty;
-        public decimal Latitud { get; set; }
-        public decimal Longitud { get; set; }
-        public string? DireccionTexto { get; set; }
-        public bool EsAnonimo { get; set; }
-        public DateTime FechaCreacion { get; set; }
-        public bool Visto { get; set; }
-        public string? Imagen { get; set; }
-        public string NombreUsuario { get; set; } = string.Empty;
-        public string TipoReporte { get; set; } = string.Empty;
-    }
-
-    public class ReporteDetailDTO
-    {
-        public int ReporteID { get; set; }
-        public int? UsuarioID { get; set; }
-        public int TipoReporteID { get; set; }
-        public string? Titulo { get; set; }
-        public string Descripcion { get; set; } = string.Empty;
-        public decimal Latitud { get; set; }
-        public decimal Longitud { get; set; }
-        public string? DireccionTexto { get; set; }
-        public bool EsAnonimo { get; set; }
-        public DateTime FechaCreacion { get; set; }
-        public bool Visto { get; set; }
-        public string? Imagen { get; set; }
-        public string NombreCompleto { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Telefono { get; set; } = string.Empty;
-        public string TipoReporte { get; set; } = string.Empty;
-        public string NumeroCasa { get; set; } = string.Empty;
-        public string Calle { get; set; } = string.Empty;
-    }
-
-    public class ReporteRequest
-    {
-        public int? UsuarioID { get; set; }
-        public int TipoReporteID { get; set; }
-        public string? Titulo { get; set; }
-        public string Descripcion { get; set; } = string.Empty;
-        public decimal Latitud { get; set; }
-        public decimal Longitud { get; set; }
-        public string? DireccionTexto { get; set; }
-        public bool EsAnonimo { get; set; }
-        public string? ImagenBase64 { get; set; }
-    }
-
-    public class CambiarAnonimatoRequest
-    {
-        public bool EsAnonimo { get; set; }
-    }
-
-    public class UpdateEstadoRequest
-    {
-        public bool Visto { get; set; }
-    }
 }

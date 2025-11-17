@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend_RSV.Data.Servicios;
 using System.Threading.Tasks;
+using Backend_RSV.Models.Request;
 
 namespace Backend_RSV.Controllers
 {
@@ -15,10 +16,6 @@ namespace Backend_RSV.Controllers
             _serviciosData = serviciosData;
         }
 
-        // ==========================================
-        // 1. TIPOS DE SERVICIO - 🟩 AMBAS (2 APIs)
-        // ==========================================
-
         [HttpGet("tipos-servicio")]
         public async Task<IActionResult> GetTiposServicio()
         {
@@ -32,13 +29,9 @@ namespace Backend_RSV.Controllers
             var tipo = await _serviciosData.GetTipoServicioByIdAsync(id);
             if (tipo == null)
                 return NotFound(new { message = "Tipo de servicio no encontrado" });
-            
+
             return Ok(tipo);
         }
-
-        // ==========================================
-        // 2. CATÁLOGO DE SERVICIOS - 🟩 AMBAS (4 APIs)
-        // ==========================================
 
         [HttpGet("catalogo")]
         public async Task<IActionResult> GetServiciosCatalogo()
@@ -53,7 +46,7 @@ namespace Backend_RSV.Controllers
             var servicio = await _serviciosData.GetServicioCatalogoByIdAsync(id);
             if (servicio == null)
                 return NotFound(new { message = "Servicio no encontrado" });
-            
+
             return Ok(servicio);
         }
 
@@ -70,7 +63,7 @@ namespace Backend_RSV.Controllers
             var servicio = await _serviciosData.UpdateServicioCatalogoAsync(id, request);
             if (servicio == null)
                 return NotFound(new { message = "Servicio no encontrado" });
-            
+
             return Ok(new { message = "Servicio actualizado exitosamente" });
         }
 
@@ -80,13 +73,10 @@ namespace Backend_RSV.Controllers
             var servicio = await _serviciosData.UpdateDisponibilidadServicioAsync(id, request.Disponible);
             if (servicio == null)
                 return NotFound(new { message = "Servicio no encontrado" });
-            
+
             return Ok(new { message = "Disponibilidad actualizada" });
         }
 
-        // ==========================================
-        // 3. PERSONAL MANTENIMIENTO - 🟦 PWA (3 APIs)
-        // ==========================================
 
         [HttpGet("personal-mantenimiento")]
         public async Task<IActionResult> GetPersonalMantenimiento()
@@ -101,7 +91,7 @@ namespace Backend_RSV.Controllers
             var personal = await _serviciosData.GetPersonalMantenimientoByIdAsync(id);
             if (personal == null)
                 return NotFound(new { message = "Personal no encontrado" });
-            
+
             return Ok(personal);
         }
 
@@ -112,9 +102,6 @@ namespace Backend_RSV.Controllers
             return Ok(new { message = "Personal registrado exitosamente", id = personal.PersonalMantenimientoID });
         }
 
-        // ==========================================
-        // 4. SOLICITUDES DE SERVICIO - 🟩 AMBAS (5 APIs)
-        // ==========================================
 
         [HttpPost("solicitud")]
         public async Task<IActionResult> CreateSolicitud([FromBody] SolicitudServicioRequest request)
@@ -136,7 +123,7 @@ namespace Backend_RSV.Controllers
             var solicitud = await _serviciosData.GetSolicitudByIdAsync(id);
             if (solicitud == null)
                 return NotFound(new { message = "Solicitud no encontrada" });
-            
+
             return Ok(solicitud);
         }
 
@@ -153,7 +140,7 @@ namespace Backend_RSV.Controllers
             var solicitud = await _serviciosData.AsignarSolicitudAsync(id, request.PersonaAsignado);
             if (solicitud == null)
                 return NotFound(new { message = "Solicitud no encontrada" });
-            
+
             return Ok(new { message = "Solicitud asignada correctamente" });
         }
 
@@ -163,7 +150,7 @@ namespace Backend_RSV.Controllers
             var solicitud = await _serviciosData.UpdateEstadoSolicitudAsync(id, request.Estado);
             if (solicitud == null)
                 return NotFound(new { message = "Solicitud no encontrada" });
-            
+
             return Ok(new { message = "Estado de solicitud actualizado" });
         }
 
@@ -173,13 +160,9 @@ namespace Backend_RSV.Controllers
             var solicitud = await _serviciosData.CompletarSolicitudAsync(id, request.NotasAdmin);
             if (solicitud == null)
                 return NotFound(new { message = "Solicitud no encontrada" });
-            
+
             return Ok(new { message = "Solicitud completada" });
         }
-
-        // ==========================================
-        // 5. CARGOS SERVICIO - 🟩 AMBAS (2 APIs)
-        // ==========================================
 
         [HttpGet("cargos/servicios/usuario/{usuarioId}")]
         public async Task<IActionResult> GetCargosServiciosByUsuario(int usuarioId)
@@ -194,10 +177,6 @@ namespace Backend_RSV.Controllers
             var cargos = await _serviciosData.GetCargosServiciosBySolicitudAsync(solicitudId);
             return Ok(cargos);
         }
-
-        // ==========================================
-        // 6. CARGOS MANTENIMIENTO - 🟩 AMBAS (4 APIs)
-        // ==========================================
 
         [HttpGet("cargos/mantenimiento")]
         public async Task<IActionResult> GetCargosMantenimiento()
@@ -226,73 +205,8 @@ namespace Backend_RSV.Controllers
             var cargo = await _serviciosData.UpdateCargoMantenimientoAsync(id, request);
             if (cargo == null)
                 return NotFound(new { message = "Cargo no encontrado" });
-            
+
             return Ok(new { message = "Cargo actualizado exitosamente" });
         }
-    }
-
-    // ==========================================
-    // REQUEST MODELS
-    // ==========================================
-
-    public class ServicioCatalogoRequest
-    {
-        public int TipoServicioID { get; set; }
-        public string NombreEncargado { get; set; } = string.Empty;
-        public string Telefono { get; set; } = string.Empty;
-        public string? Email { get; set; }
-        public string? NotasInternas { get; set; }
-        public bool Disponible { get; set; } = true;
-    }
-
-    public class UpdateDisponibilidadRequest
-    {
-        public bool Disponible { get; set; }
-    }
-
-    public class PersonalMantenimientoRequest
-    {
-        public int PersonaID { get; set; }
-        public string Puesto { get; set; } = string.Empty;
-        public DateOnly FechaContratacion { get; set; }
-        public decimal Sueldo { get; set; }
-        public string? TipoContrato { get; set; }
-        public string? Turno { get; set; }
-        public string? DiasLaborales { get; set; }
-        public string? Notas { get; set; }
-    }
-
-    public class SolicitudServicioRequest
-    {
-        public int UsuarioID { get; set; }
-        public int TipoServicioID { get; set; }
-        public string Descripcion { get; set; } = string.Empty;
-        public string Urgencia { get; set; } = "Media";
-        public DateOnly? FechaPreferida { get; set; }
-        public TimeSpan? HoraPreferida { get; set; }
-    }
-
-    public class AsignarSolicitudRequest
-    {
-        public int PersonaAsignado { get; set; }
-    }
-
-    public class UpdateEstadoSolicitudRequest
-    {
-        public string Estado { get; set; } = string.Empty;
-    }
-
-    public class CompletarSolicitudRequest
-    {
-        public string? NotasAdmin { get; set; }
-    }
-
-    public class CargoMantenimientoRequest
-    {
-        public int? UsuarioID { get; set; }
-        public int? PersonalMantenimientoID { get; set; }
-        public string Concepto { get; set; } = string.Empty;
-        public decimal Monto { get; set; }
-        public DateOnly FechaVencimiento { get; set; }
     }
 }

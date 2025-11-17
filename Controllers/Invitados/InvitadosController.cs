@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend_RSV.Data.Invitados;
 using System.Threading.Tasks;
+using Backend_RSV.Models.Request;
 
 namespace Backend_RSV.Controllers
 {
@@ -15,7 +16,6 @@ namespace Backend_RSV.Controllers
             _invitadosData = invitadosData;
         }
 
-        // 🟨 ANDROID: Registrar invitado y generar QR
         [HttpPost]
         public async Task<IActionResult> CrearInvitado([FromBody] CrearInvitadoRequest request)
         {
@@ -28,7 +28,6 @@ namespace Backend_RSV.Controllers
             });
         }
 
-        // 🟨 ANDROID: Listar invitados del residente
         [HttpGet("usuario/{usuarioId}")]
         public async Task<IActionResult> GetInvitadosByUsuario(int usuarioId)
         {
@@ -36,7 +35,6 @@ namespace Backend_RSV.Controllers
             return Ok(invitados);
         }
 
-        // 🟨 ANDROID: Cancelar invitación
         [HttpPut("{id}/cancelar")]
         public async Task<IActionResult> CancelarInvitacion(int id)
         {
@@ -47,7 +45,6 @@ namespace Backend_RSV.Controllers
             return Ok(new { message = "Invitación cancelada" });
         }
 
-        // 🟦 PWA: Listar todos los invitados (admin)
         [HttpGet]
         public async Task<IActionResult> GetAllInvitados()
         {

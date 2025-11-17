@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend_RSV.Data.Reportes;
 using System.Threading.Tasks;
+using Backend_RSV.Models.Request;
 
 namespace Backend_RSV.Controllers
 {
@@ -28,7 +29,7 @@ namespace Backend_RSV.Controllers
             var reporte = await _reporteData.GetReporteByIdAsync(id);
             if (reporte == null)
                 return NotFound(new { message = "Reporte no encontrado" });
-            
+
             return Ok(reporte);
         }
 
@@ -47,12 +48,12 @@ namespace Backend_RSV.Controllers
         }
 
         [HttpPut("{id}/estado")]
-        public async Task<IActionResult> UpdateReporteEstado(int id, [FromBody] UpdateEstadoRequest request)
+        public async Task<IActionResult> UpdateReporteEstado(int id, [FromBody] UpdateEstadoReporteRequest request)
         {
             var reporte = await _reporteData.UpdateReporteEstadoAsync(id, request.Visto);
             if (reporte == null)
                 return NotFound(new { message = "Reporte no encontrado" });
-            
+
             return Ok(new { message = "Estado del reporte actualizado" });
         }
 
@@ -62,7 +63,7 @@ namespace Backend_RSV.Controllers
             var reporte = await _reporteData.CambiarAnonimatoAsync(id, request.EsAnonimo);
             if (reporte == null)
                 return NotFound(new { message = "Reporte no encontrado" });
-            
+
             return Ok(new { message = "Anonimato del reporte actualizado" });
         }
 

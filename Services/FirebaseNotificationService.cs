@@ -21,7 +21,6 @@ namespace Backend_RSV.Services
         {
             try
             {
-                // Obtener info del usuario
                 var usuario = await _context.Usuarios
                     .Include(u => u.Persona)
                     .FirstOrDefaultAsync(u => u.UsuarioID == alerta.UsuarioID);
@@ -34,10 +33,9 @@ namespace Backend_RSV.Services
 
                 string nombreUsuario = usuario.Persona.Nombre + " " + usuario.Persona.ApellidoPaterno;
 
-                // Configurar mensaje de notificación
                 var message = new Message()
                 {
-                    Topic = "panic_alerts", // Topic para alertas de panico
+                    Topic = "panic_alerts",
                     Notification = new Notification()
                     {
                         Title = "ALERTA DE PANICO ACTIVADA",
@@ -66,7 +64,7 @@ namespace Backend_RSV.Services
                     {
                         Headers = new Dictionary<string, string>()
                         {
-                            { "apns-priority", "10" } // Maxima prioridad iOS
+                            { "apns-priority", "10" }
                         },
                         Aps = new Aps()
                         {
@@ -76,7 +74,6 @@ namespace Backend_RSV.Services
                     }
                 };
 
-                // Enviar notificacion push
                 string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
                 Console.WriteLine($"Notificacion FCM enviada exitosamente: {response}");
                 Console.WriteLine($"Topic: panic_alerts");

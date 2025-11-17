@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend_RSV.Models.Request;
 
 namespace Backend_RSV.Data.Alertas
 {
@@ -15,8 +16,6 @@ namespace Backend_RSV.Data.Alertas
         {
             _context = context;
         }
-
-        // GET ALL - CON DTO
         public async Task<List<AlertaPanicoDTO>> GetAlertasAsync()
         {
             return await _context.AlertasPanico
@@ -38,8 +37,6 @@ namespace Backend_RSV.Data.Alertas
                 })
                 .ToListAsync();
         }
-
-        // GET BY ID - CON DTO
         public async Task<AlertaPanicoDetailDTO?> GetAlertaByIdAsync(int id)
         {
             return await _context.AlertasPanico
@@ -55,8 +52,8 @@ namespace Backend_RSV.Data.Alertas
                     Latitud = a.Latitud,
                     Longitud = a.Longitud,
                     FechaHora = a.FechaHora,
-                    NombreCompleto = a.Usuario.Persona.Nombre + " " + 
-                                   a.Usuario.Persona.ApellidoPaterno + " " + 
+                    NombreCompleto = a.Usuario.Persona.Nombre + " " +
+                                   a.Usuario.Persona.ApellidoPaterno + " " +
                                    a.Usuario.Persona.ApellidoMaterno,
                     Email = a.Usuario.Persona.Email,
                     Telefono = a.Usuario.Persona.Telefono,
@@ -67,7 +64,6 @@ namespace Backend_RSV.Data.Alertas
                 .FirstOrDefaultAsync();
         }
 
-        // GET BY USUARIO - CON DTO
         public async Task<List<AlertaPanicoDTO>> GetAlertasByUsuarioAsync(int usuarioId)
         {
             return await _context.AlertasPanico
@@ -91,7 +87,6 @@ namespace Backend_RSV.Data.Alertas
                 .ToListAsync();
         }
 
-        // CREATE - SE MANTIENE IGUAL
         public async Task<AlertaPanico> CreateAlertaAsync(AlertaPanicoRequest request)
         {
             var alerta = new AlertaPanico
@@ -114,18 +109,5 @@ namespace Backend_RSV.Data.Alertas
 
             return alerta;
         }
-    }
-
-    // SOLO las clases Request aquí (NO los DTOs)
-    public class AlertaPanicoRequest
-    {
-        public int UsuarioID { get; set; }
-        public decimal Latitud { get; set; }
-        public decimal Longitud { get; set; }
-    }
-
-    public class UpdateEstadoRequest
-    {
-        public string Estado { get; set; } = string.Empty;
     }
 }

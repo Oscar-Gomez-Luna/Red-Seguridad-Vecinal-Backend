@@ -29,8 +29,6 @@ namespace Backend_RSV.Services
         {
             _context = context;
             _configuration = configuration;
-
-            // Inicializar Firebase Admin SDK si no está inicializado
             if (FirebaseApp.DefaultInstance == null)
             {
                 FirebaseApp.Create(new AppOptions()
@@ -39,10 +37,8 @@ namespace Backend_RSV.Services
                 });
             }
 
-            // Obtener el token de acceso para Firebase Database
             var accessToken = GetAccessTokenAsync().Result;
-            
-            // Configuración del cliente Firebase con autenticación
+
             _firebaseClient = new FirebaseClient(
                 "https://red-seguridad-vecinal-default-rtdb.firebaseio.com/",
                 new FirebaseOptions
@@ -55,7 +51,6 @@ namespace Backend_RSV.Services
         {
             try
             {
-                // Obtener token de acceso usando las credenciales del archivo JSON
                 var credential = GoogleCredential.FromFile("firebase-adminsdk.json")
                     .CreateScoped("https://www.googleapis.com/auth/firebase.database");
 
@@ -73,7 +68,6 @@ namespace Backend_RSV.Services
         {
             try
             {
-                // Obtener información del usuario
                 var usuario = await _context.Usuarios
                     .Include(u => u.Persona)
                     .FirstOrDefaultAsync(u => u.UsuarioID == alerta.UsuarioID);
@@ -83,7 +77,6 @@ namespace Backend_RSV.Services
 
                 string nombreCompleto = $"{usuario.Persona.Nombre} {usuario.Persona.ApellidoPaterno}";
 
-                // Crear objeto para Firebase
                 var firebaseAlerta = new FirebaseAlertaPanico
                 {
                     id_alerta_ejemplo = $"alerta_{alerta.AlertaID}_{DateTime.Now:yyyyMMddHHmmss}",
@@ -98,13 +91,12 @@ namespace Backend_RSV.Services
                     uid = alerta.UsuarioID.ToString()
                 };
 
-                // Guardar en Firebase
                 var result = await _firebaseClient
                     .Child("alertas_panico")
                     .PostAsync(firebaseAlerta);
 
                 Console.WriteLine($"Alerta guardada en Firebase con ID: {result.Key}");
-                return result.Key; // Retorna el ID generado por Firebase
+                return result.Key;
             }
             catch (Exception ex)
             {
@@ -121,7 +113,7 @@ namespace Backend_RSV.Services
                     .Child("alertas_panico")
                     .Child(firebaseId)
                     .Child("estatus")
-                    .PutAsync(nuevoEstatus);
+                    .PutAsync($"\"{nuevoEstatus}\"");
 
                 Console.WriteLine($"Estatus actualizado en Firebase para ID: {firebaseId}");
                 return true;
