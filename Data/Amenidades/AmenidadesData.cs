@@ -99,13 +99,15 @@ namespace Backend_RSV.Data.Amenidades
                 HoraInicio = request.HoraInicio,
                 HoraFin = request.HoraFin,
                 Motivo = request.Motivo,
-                FechaCreacion = DateTime.Now
+                FechaCreacion = DateTime.Now,
+                Estado = "Pendiente"
             };
 
             _context.Reservas.Add(reserva);
             await _context.SaveChangesAsync();
             return reserva;
         }
+
 
         public async Task<List<ReservaDTO>> GetReservasByUsuarioAsync(int usuarioId)
         {
@@ -128,10 +130,12 @@ namespace Backend_RSV.Data.Amenidades
                     FechaCreacion = r.FechaCreacion,
                     AmenidadNombre = r.Amenidad.Nombre,
                     TipoAmenidad = r.Amenidad.TipoAmenidad.Nombre,
-                    NombreUsuario = r.Usuario.Persona.Nombre + " " + r.Usuario.Persona.ApellidoPaterno
+                    NombreUsuario = r.Usuario.Persona.Nombre + " " + r.Usuario.Persona.ApellidoPaterno,
+                    Estado = r.Estado
                 })
                 .ToListAsync();
         }
+
 
         public async Task<List<ReservaDTO>> GetAllReservasAsync()
         {
@@ -154,10 +158,12 @@ namespace Backend_RSV.Data.Amenidades
                     AmenidadNombre = r.Amenidad.Nombre,
                     TipoAmenidad = r.Amenidad.TipoAmenidad.Nombre,
                     NombreUsuario = r.Usuario.Persona.Nombre + " " + r.Usuario.Persona.ApellidoPaterno,
-                    NumeroCasa = r.Usuario.NumeroCasa
+                    NumeroCasa = r.Usuario.NumeroCasa,
+                    Estado = r.Estado
                 })
                 .ToListAsync();
         }
+
 
         public async Task<ReservaDTO?> GetReservaByIdAsync(int id)
         {
@@ -182,26 +188,39 @@ namespace Backend_RSV.Data.Amenidades
                     NombreUsuario = r.Usuario.Persona.Nombre + " " + r.Usuario.Persona.ApellidoPaterno,
                     EmailUsuario = r.Usuario.Persona.Email,
                     TelefonoUsuario = r.Usuario.Persona.Telefono,
-                    NumeroCasa = r.Usuario.NumeroCasa
+                    NumeroCasa = r.Usuario.NumeroCasa,
+                    Estado = r.Estado
                 })
                 .FirstOrDefaultAsync();
         }
+
 
         public async Task<bool> CancelarReservaAsync(int reservaId)
         {
             var reserva = await _context.Reservas
                 .FirstOrDefaultAsync(r => r.ReservaID == reservaId);
 
-            if (reserva == null) return false;
+            if (reserva == null)
+                return false;
 
-            _context.Reservas.Remove(reserva);
+            reserva.Estado = "Cancelada";
             await _context.SaveChangesAsync();
             return true;
         }
 
+
         public async Task<bool> UpdateEstadoReservaAsync(int reservaId, string estado)
         {
-            return await Task.FromResult(true);
+            var reserva = await _context.Reservas
+                .FirstOrDefaultAsync(r => r.ReservaID == reservaId);
+
+            if (reserva == null)
+                return false;
+
+            reserva.Estado = estado;
+            await _context.SaveChangesAsync();
+            return true;
         }
+
     }
 }

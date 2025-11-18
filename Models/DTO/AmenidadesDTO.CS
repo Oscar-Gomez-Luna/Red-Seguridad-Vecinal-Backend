@@ -32,6 +32,7 @@ namespace Backend_RSV.Data.Alertas
         public DateOnly FechaReserva { get; set; }
         public TimeSpan HoraInicio { get; set; }
         public TimeSpan HoraFin { get; set; }
+        public string Estado { get; set; } = string.Empty;
         public string? Motivo { get; set; }
         public DateTime FechaCreacion { get; set; }
         public string AmenidadNombre { get; set; } = string.Empty;

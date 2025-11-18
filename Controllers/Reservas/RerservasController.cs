@@ -51,6 +51,7 @@ namespace Backend_RSV.Controllers
         public async Task<IActionResult> CancelarReserva(int id)
         {
             var resultado = await _amenidadesData.CancelarReservaAsync(id);
+
             if (!resultado)
                 return NotFound(new { message = "Reserva no encontrada" });
 
@@ -61,10 +62,11 @@ namespace Backend_RSV.Controllers
         public async Task<IActionResult> UpdateEstadoReserva(int id, [FromBody] UpdateEstadoReservaRequest request)
         {
             var resultado = await _amenidadesData.UpdateEstadoReservaAsync(id, request.Estado);
+
             if (!resultado)
                 return NotFound(new { message = "Reserva no encontrada" });
 
-            return Ok(new { message = "Estado de reserva actualizado" });
+            return Ok(new { message = "Estado de reserva actualizado correctamente", estado = request.Estado });
         }
     }
 }
