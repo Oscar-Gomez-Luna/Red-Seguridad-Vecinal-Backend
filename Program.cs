@@ -1,7 +1,7 @@
+using Backend_RSV.Services;
 using MiApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Backend_RSV.Data.Alertas;
-using Backend_RSV.Services;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using System.IO;
@@ -48,6 +48,9 @@ builder.Services.AddScoped<IFirebaseDataService, FirebaseDataService>();
 builder.Services.AddScoped<InvitadosData>();
 builder.Services.AddScoped<QrService>();
 builder.Services.AddScoped<AmenidadesData>();
+builder.Services.AddSingleton<IAlertasTrackingService, AlertasTrackingService>();
+builder.Services.AddHostedService(sp => (AlertasTrackingService)sp.GetRequiredService<IAlertasTrackingService>());
+
 
 var app = builder.Build();
 

@@ -17,6 +17,7 @@ namespace Backend_RSV.Services
         Task<string> GuardarAlertaEnFirebase(AlertaPanico alerta);
         Task<bool> ActualizarEstatusAlerta(string firebaseId, string nuevoEstatus);
         Task<bool> EliminarAlertaFirebase(string firebaseId);
+        Task<FirebaseAlertaPanico> ObtenerAlertaFirebase(string firebaseId);
     }
 
     public class FirebaseDataService : IFirebaseDataService
@@ -141,6 +142,24 @@ namespace Backend_RSV.Services
             {
                 Console.WriteLine($"Error al eliminar alerta en Firebase: {ex.Message}");
                 return false;
+            }
+        }
+
+        public async Task<FirebaseAlertaPanico> ObtenerAlertaFirebase(string firebaseId)
+        {
+            try
+            {
+                var alerta = await _firebaseClient
+                    .Child("alertas_panico")
+                    .Child(firebaseId)
+                    .OnceSingleAsync<FirebaseAlertaPanico>();
+
+                return alerta;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error obteniendo alerta de Firebase {firebaseId}: {ex.Message}");
+                throw;
             }
         }
     }

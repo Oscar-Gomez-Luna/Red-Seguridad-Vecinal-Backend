@@ -109,5 +109,27 @@ namespace Backend_RSV.Data.Alertas
 
             return alerta;
         }
+        // Actualizar coordenadas
+        public async Task UpdateAlertaCoordenadasAsync(int alertaId, decimal lat, decimal lng)
+        {
+            var alerta = await _context.AlertasPanico.FindAsync(alertaId);
+            if (alerta != null)
+            {
+                alerta.Latitud = lat;
+                alerta.Longitud = lng;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // Actualizar estatus (solo sincronización, no requiere campo nuevo si no existe)
+        public async Task UpdateAlertaEstatusAsync(int alertaId, string estatus)
+        {
+            var alerta = await _context.AlertasPanico.FindAsync(alertaId);
+            if (alerta != null)
+            {
+                await _context.SaveChangesAsync();
+            }
+        }
+
     }
 }
