@@ -276,7 +276,7 @@ namespace Backend_RSV.Data.Invitados
                 UsuarioID = usuarioId,
                 CodigoQR = qrTexto,
                 FechaGeneracion = DateTime.Now,
-                FechaVencimiento = DateTime.Now.AddYears(1),
+                FechaVencimiento = DateTime.Now.AddDays(7),
                 Activo = true
             };
 

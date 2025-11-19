@@ -32,6 +32,7 @@ public class Reserva
 
     // Navigation properties
     [ForeignKey("UsuarioID")]
+
     public virtual Usuario Usuario { get; set; } = null!;
 
     [ForeignKey("AmenidadID")]
