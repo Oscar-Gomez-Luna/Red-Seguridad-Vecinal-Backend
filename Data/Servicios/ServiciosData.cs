@@ -255,6 +255,75 @@ namespace Backend_RSV.Data.Servicios
                 .ToListAsync();
         }
 
+        public async Task<CargoServicioDTO?> CreateCargoServicioAsync(CargoServicioDTO dto)
+        {
+            // Validar solicitud
+            var solicitud = await _context.SolicitudesServicio
+                .FirstOrDefaultAsync(s => s.SolicitudID == dto.SolicitudID);
+
+            if (solicitud == null)
+                return null;
+
+            // Validar usuario
+            var usuario = await _context.Usuarios
+                .Include(u => u.Persona)
+                .FirstOrDefaultAsync(u => u.UsuarioID == dto.UsuarioID);
+
+            if (usuario == null)
+                return null;
+
+            // Crear registro
+            var cargo = new CargoServicio
+            {
+                UsuarioID = dto.UsuarioID,
+                SolicitudID = dto.SolicitudID,
+                Concepto = dto.Concepto,
+                Monto = dto.Monto,
+                FechaCreacion = DateTime.Now,
+                Estado = "Pendiente",
+                MontoPagado = 0
+            };
+
+            _context.CargosServicios.Add(cargo);
+            await _context.SaveChangesAsync();
+
+            return new CargoServicioDTO
+            {
+                CargoServicioID = cargo.CargoServicioID,
+                UsuarioID = cargo.UsuarioID,
+                SolicitudID = cargo.SolicitudID,
+                Concepto = cargo.Concepto,
+                Monto = cargo.Monto,
+                MontoPagado = cargo.MontoPagado,
+                SaldoPendiente = cargo.Monto - cargo.MontoPagado,
+                FechaCreacion = cargo.FechaCreacion,
+                Estado = cargo.Estado,
+                NombreUsuario = usuario.Persona.Nombre
+            };
+        }
+
+        public async Task<IEnumerable<CargoServicioDTO>> GetAllCargosServiciosAsync()
+{
+    return await _context.CargosServicios
+        .Include(c => c.Usuario)
+            .ThenInclude(u => u.Persona)
+        .Include(c => c.Solicitud)
+        .Select(c => new CargoServicioDTO
+        {
+            CargoServicioID = c.CargoServicioID,
+            UsuarioID = c.UsuarioID,
+            SolicitudID = c.SolicitudID,
+            Concepto = c.Concepto,
+            Monto = c.Monto,
+            MontoPagado = c.MontoPagado,
+            SaldoPendiente = c.Monto - c.MontoPagado,
+            FechaCreacion = c.FechaCreacion,
+            Estado = c.Estado,
+            NombreUsuario = c.Usuario.Persona.Nombre
+        })
+        .ToListAsync();
+}
+
 
         public async Task<List<CargoMantenimientoDTO>> GetCargosMantenimientoAsync()
         {

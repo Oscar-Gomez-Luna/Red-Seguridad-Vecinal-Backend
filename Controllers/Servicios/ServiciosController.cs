@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Backend_RSV.Data.Servicios;
 using System.Threading.Tasks;
 using Backend_RSV.Models.Request;
+using Backend_RSV.Models.DTO;
 
 namespace Backend_RSV.Controllers
 {
@@ -170,6 +171,31 @@ namespace Backend_RSV.Controllers
             var cargos = await _serviciosData.GetCargosServiciosByUsuarioAsync(usuarioId);
             return Ok(cargos);
         }
+
+        [HttpPost("cargos/servicios")]
+        public async Task<IActionResult> CreateCargoServicio([FromBody] CargoServicioDTO dto)
+        {
+            var cargo = await _serviciosData.CreateCargoServicioAsync(dto);
+
+            if (cargo == null)
+                return BadRequest(new { message = "No se pudo crear el cargo. Verifica los datos." });
+
+            return Ok(new
+            {
+                message = "Cargo de servicio creado exitosamente",
+                cargo
+            });
+        }
+
+        [HttpGet("cargos/servicios")]
+public async Task<IActionResult> GetAllCargosServicios()
+{
+    var cargos = await _serviciosData.GetAllCargosServiciosAsync();
+    return Ok(cargos);
+}
+
+
+
 
         [HttpGet("cargos/servicios/solicitud/{solicitudId}")]
         public async Task<IActionResult> GetCargosServiciosBySolicitud(int solicitudId)
