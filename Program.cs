@@ -65,20 +65,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
-var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), "firebase-key.json");
-if (File.Exists(firebasePath))
-{
-    FirebaseApp.Create(new AppOptions()
-    {
-        Credential = GoogleCredential.FromFile(firebasePath),
-    });
-    Console.WriteLine("Firebase configurado correctamente");
-}
-else
-{
-    Console.WriteLine($"Archivo firebase-adminsdk.json no encontrado en: {firebasePath}");
-    Console.WriteLine("Las notificaciones funcionarán en modo simulación");
-}
+var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), "firebase-adminsdk.json");
 
 var app = builder.Build();
 
