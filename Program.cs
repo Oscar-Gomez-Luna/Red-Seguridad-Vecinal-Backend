@@ -3,14 +3,26 @@ using Backend_RSV.Data.Avisos;
 using Backend_RSV.Data.Estadisticas;
 using Backend_RSV.Data.Mapa;
 using Backend_RSV.Data.Usuarios;
+using Backend_RSV.Services;
 using MiApi.Data;
 using Microsoft.EntityFrameworkCore;
+using Backend_RSV.Data.Alertas;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using System.IO;
+using Backend_RSV.Data.Reportes;
+using Backend_RSV.Data.Servicios;
+using Backend_RSV.Data.Invitados;
+using Backend_RSV.Data.Amenidades;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
-builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
@@ -22,6 +34,16 @@ builder.Services.AddScoped<AvisosData>();
 builder.Services.AddScoped<PagosData>();
 builder.Services.AddScoped<MapaData>();
 builder.Services.AddScoped<EstadisticasData>();
+builder.Services.AddScoped<AlertaPanicoData>();
+builder.Services.AddScoped<FirebaseNotificationService>();
+builder.Services.AddScoped<ReporteData>();
+builder.Services.AddScoped<ServiciosData>();
+builder.Services.AddScoped<IFirebaseDataService, FirebaseDataService>();
+builder.Services.AddScoped<InvitadosData>();
+builder.Services.AddScoped<QrService>();
+builder.Services.AddScoped<AmenidadesData>();
+builder.Services.AddSingleton<IAlertasTrackingService, AlertasTrackingService>();
+builder.Services.AddHostedService(sp => (AlertasTrackingService)sp.GetRequiredService<IAlertasTrackingService>());
 
 Backend_RSV.Config.FirebaseInitializer.Initialize();
 
@@ -43,10 +65,23 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
+var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), "firebase-key.json");
+if (File.Exists(firebasePath))
+{
+    FirebaseApp.Create(new AppOptions()
+    {
+        Credential = GoogleCredential.FromFile(firebasePath),
+    });
+    Console.WriteLine("Firebase configurado correctamente");
+}
+else
+{
+    Console.WriteLine($"Archivo firebase-adminsdk.json no encontrado en: {firebasePath}");
+    Console.WriteLine("Las notificaciones funcionarán en modo simulación");
+}
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     using (var scope = app.Services.CreateScope())
@@ -60,11 +95,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("NuevaPolitica");
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

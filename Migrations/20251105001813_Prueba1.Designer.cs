@@ -4,6 +4,7 @@ using MiApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_RSV.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251105001813_Prueba1")]
+    partial class Prueba1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,42 +251,6 @@ namespace Backend_RSV.Migrations
                     b.ToTable("CategoriasAviso");
                 });
 
-            modelBuilder.Entity("ComprobantePago", b =>
-                {
-                    b.Property<int>("ComprobanteID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComprobanteID"));
-
-                    b.Property<byte[]>("Archivo")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<DateTime>("FechaSubida")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("NombreArchivo")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("PagoID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TipoArchivo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("ComprobanteID");
-
-                    b.HasIndex("PagoID")
-                        .IsUnique();
-
-                    b.ToTable("ComprobantesPago");
-                });
-
             modelBuilder.Entity("CuentaUsuario", b =>
                 {
                     b.Property<int>("CuentaID")
@@ -292,9 +259,8 @@ namespace Backend_RSV.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CuentaID"));
 
-                    b.Property<string>("FechaVencimiento")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateOnly>("FechaVencimiento")
+                        .HasColumnType("date");
 
                     b.Property<byte[]>("NumeroTarjeta")
                         .IsRequired()
@@ -467,9 +433,6 @@ namespace Backend_RSV.Migrations
                     b.Property<int?>("CargoMantenimientoID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CargoServicioID")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("FechaPago")
                         .HasColumnType("datetime2");
 
@@ -502,8 +465,6 @@ namespace Backend_RSV.Migrations
                     b.HasKey("PagoID");
 
                     b.HasIndex("CargoMantenimientoID");
-
-                    b.HasIndex("CargoServicioID");
 
                     b.HasIndex("FolioUnico")
                         .IsUnique();
@@ -602,6 +563,22 @@ namespace Backend_RSV.Migrations
                         .IsUnique();
 
                     b.ToTable("PersonalMantenimiento");
+                });
+
+            modelBuilder.Entity("Prueba", b =>
+                {
+                    b.Property<int>("AvisoID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AvisoID"));
+
+                    b.Property<int>("UsuarioID")
+                        .HasColumnType("int");
+
+                    b.HasKey("AvisoID");
+
+                    b.ToTable("Prueba");
                 });
 
             modelBuilder.Entity("QRPersonal", b =>
@@ -703,11 +680,6 @@ namespace Backend_RSV.Migrations
 
                     b.Property<int>("AmenidadID")
                         .HasColumnType("int");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
@@ -1077,17 +1049,6 @@ namespace Backend_RSV.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("ComprobantePago", b =>
-                {
-                    b.HasOne("Pago", "Pago")
-                        .WithOne("Comprobante")
-                        .HasForeignKey("ComprobantePago", "PagoID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Pago");
-                });
-
             modelBuilder.Entity("CuentaUsuario", b =>
                 {
                     b.HasOne("Usuario", "Usuario")
@@ -1138,11 +1099,6 @@ namespace Backend_RSV.Migrations
                         .HasForeignKey("CargoMantenimientoID")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("CargoServicio", "CargoServicio")
-                        .WithMany("Pagos")
-                        .HasForeignKey("CargoServicioID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Usuario", "Usuario")
                         .WithMany("Pagos")
                         .HasForeignKey("UsuarioID")
@@ -1150,8 +1106,6 @@ namespace Backend_RSV.Migrations
                         .IsRequired();
 
                     b.Navigation("CargoMantenimiento");
-
-                    b.Navigation("CargoServicio");
 
                     b.Navigation("Usuario");
                 });
@@ -1280,11 +1234,6 @@ namespace Backend_RSV.Migrations
                     b.Navigation("Pagos");
                 });
 
-            modelBuilder.Entity("CargoServicio", b =>
-                {
-                    b.Navigation("Pagos");
-                });
-
             modelBuilder.Entity("CategoriaAviso", b =>
                 {
                     b.Navigation("Avisos");
@@ -1292,8 +1241,6 @@ namespace Backend_RSV.Migrations
 
             modelBuilder.Entity("Pago", b =>
                 {
-                    b.Navigation("Comprobante");
-
                     b.Navigation("DetallesPago");
                 });
 
