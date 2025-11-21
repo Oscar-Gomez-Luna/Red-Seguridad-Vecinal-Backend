@@ -78,7 +78,7 @@ namespace Backend_RSV.Controllers.Pagos
                 _context.Pagos.Add(pago);
                 await _context.SaveChangesAsync();
 
-                if (comprobante != null && comprobante.Archivo != null)
+                if (comprobante != null)
                 {
                     comprobante.PagoID = pago.PagoID;
                     _context.ComprobantesPago.Add(comprobante);
@@ -94,7 +94,6 @@ namespace Backend_RSV.Controllers.Pagos
                 throw;
             }
         }
-
 
         public async Task<Pago?> ObtenerPagoPorIdAsync(int id)
         {

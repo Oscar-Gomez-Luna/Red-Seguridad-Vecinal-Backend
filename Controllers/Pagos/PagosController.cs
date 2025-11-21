@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend_RSV.Models.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_RSV.Controllers.Pagos
@@ -96,7 +97,7 @@ namespace Backend_RSV.Controllers.Pagos
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegistrarPago([FromForm] Pago pago, IFormFile? comprobante)
+        public async Task<IActionResult> RegistrarPago([FromForm] PagoRegistroRequest request, IFormFile? comprobante)
         {
             ComprobantePago? comprobantePago = null;
 
@@ -112,6 +113,37 @@ namespace Backend_RSV.Controllers.Pagos
                 };
             }
 
+            List<DetallePagoRequest> detallesRequest = new();
+
+            if (!string.IsNullOrWhiteSpace(request.DetallesPagoJson))
+            {
+                detallesRequest = System.Text.Json.JsonSerializer
+                    .Deserialize<List<DetallePagoRequest>>(request.DetallesPagoJson)
+                    ?? new List<DetallePagoRequest>();
+            }
+
+            var pago = new Pago
+            {
+                UsuarioID = request.UsuarioID,
+                CargoMantenimientoID = request.CargoMantenimientoID,
+                CargoServicioID = request.CargoServicioID,
+                FolioUnico = request.FolioUnico,
+                MontoTotal = request.MontoTotal,
+                TipoPago = request.TipoPago,
+                MetodoPago = request.MetodoPago,
+                UltimosDigitosTarjeta = request.UltimosDigitosTarjeta,
+                FechaPago = DateTime.Now
+            };
+            foreach (var d in detallesRequest)
+            {
+                pago.DetallesPago.Add(new DetallePago
+                {
+                    TipoCargo = d.TipoCargo,
+                    CargoID = d.CargoID,
+                    MontoAplicado = d.MontoAplicado,
+                    FechaAplicacion = DateTime.Now
+                });
+            }
             var nuevoPago = await _pagosData.RegistrarPagoAsync(pago, comprobantePago);
 
             return Ok(new
