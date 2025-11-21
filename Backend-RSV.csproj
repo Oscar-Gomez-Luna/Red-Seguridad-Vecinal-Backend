@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
-    <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
     <PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.72.0" />
     <PackageReference Include="itext7" Version="9.3.0" />
