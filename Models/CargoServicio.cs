@@ -37,4 +37,5 @@ public class CargoServicio
 
     [ForeignKey("SolicitudID")]
     public virtual SolicitudesServicio Solicitud { get; set; } = null!;
+    public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
 }

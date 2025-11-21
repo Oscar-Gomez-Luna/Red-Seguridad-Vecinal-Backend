@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 public class Pago
 {
@@ -10,6 +11,8 @@ public class Pago
     public int UsuarioID { get; set; }
 
     public int? CargoMantenimientoID { get; set; }
+
+    public int? CargoServicioID { get; set; }
 
     [Required]
     [StringLength(50)]
@@ -31,12 +34,17 @@ public class Pago
     [StringLength(4)]
     public string? UltimosDigitosTarjeta { get; set; }
 
-    // Navigation properties
+    [ValidateNever]
     [ForeignKey("UsuarioID")]
     public virtual Usuario Usuario { get; set; } = null!;
 
     [ForeignKey("CargoMantenimientoID")]
     public virtual CargoMantenimiento? CargoMantenimiento { get; set; }
 
+    [ForeignKey("CargoServicioID")]
+    public virtual CargoServicio? CargoServicio { get; set; }
+
     public virtual ICollection<DetallePago> DetallesPago { get; set; } = new List<DetallePago>();
+
+    public virtual ComprobantePago? Comprobante { get; set; }
 }

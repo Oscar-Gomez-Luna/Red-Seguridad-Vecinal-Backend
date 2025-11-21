@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 public class Usuario
 {
@@ -44,8 +45,12 @@ public class Usuario
     public virtual ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
     public virtual ICollection<SolicitudesServicio> SolicitudesServicio { get; set; } = new List<SolicitudesServicio>();
     public virtual CuentaUsuario? CuentaUsuario { get; set; }
+
+    [JsonIgnore]
     public virtual ICollection<CargoMantenimiento> CargosMantenimiento { get; set; } = new List<CargoMantenimiento>();
+    [JsonIgnore]
     public virtual ICollection<CargoServicio> CargosServicios { get; set; } = new List<CargoServicio>();
+    [JsonIgnore]
     public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
     public virtual ICollection<MarcadorMapa> MarcadoresMapa { get; set; } = new List<MarcadorMapa>();
 }
