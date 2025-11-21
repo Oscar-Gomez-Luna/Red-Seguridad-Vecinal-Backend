@@ -14,6 +14,7 @@
     <PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.72.0" />
     <PackageReference Include="itext7" Version="9.3.0" />
+    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="3.7.9" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
@@ -23,6 +24,9 @@
     </PackageReference>
     <PackageReference Include="QuestPDF" Version="2025.7.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+    <None Update="logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

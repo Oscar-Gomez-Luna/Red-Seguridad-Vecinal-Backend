@@ -97,22 +97,8 @@ namespace Backend_RSV.Controllers.Pagos
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegistrarPago([FromForm] PagoRegistroRequest request, IFormFile? comprobante)
+        public async Task<IActionResult> RegistrarPago([FromBody] PagoRegistroRequest request)
         {
-            ComprobantePago? comprobantePago = null;
-
-            if (comprobante != null)
-            {
-                using var ms = new MemoryStream();
-                await comprobante.CopyToAsync(ms);
-                comprobantePago = new ComprobantePago
-                {
-                    Archivo = ms.ToArray(),
-                    NombreArchivo = comprobante.FileName,
-                    TipoArchivo = comprobante.ContentType
-                };
-            }
-
             List<DetallePagoRequest> detallesRequest = new();
 
             if (!string.IsNullOrWhiteSpace(request.DetallesPagoJson))
@@ -125,32 +111,42 @@ namespace Backend_RSV.Controllers.Pagos
             var pago = new Pago
             {
                 UsuarioID = request.UsuarioID,
-                CargoMantenimientoID = request.CargoMantenimientoID,
-                CargoServicioID = request.CargoServicioID,
-                FolioUnico = request.FolioUnico,
+                FolioUnico = Guid.NewGuid().ToString("N")[..12].ToUpper(),
                 MontoTotal = request.MontoTotal,
                 TipoPago = request.TipoPago,
                 MetodoPago = request.MetodoPago,
-                UltimosDigitosTarjeta = request.UltimosDigitosTarjeta,
                 FechaPago = DateTime.Now
             };
+
             foreach (var d in detallesRequest)
             {
                 pago.DetallesPago.Add(new DetallePago
                 {
-                    TipoCargo = d.TipoCargo,
-                    CargoID = d.CargoID,
                     MontoAplicado = d.MontoAplicado,
+                    CargoMantenimientoID = d.CargoMantenimientoID,
+                    CargoServicioID = d.CargoServicioID,
                     FechaAplicacion = DateTime.Now
                 });
             }
-            var nuevoPago = await _pagosData.RegistrarPagoAsync(pago, comprobantePago);
 
-            return Ok(new
+            try
             {
-                message = "Pago registrado correctamente",
-                pagoId = nuevoPago.PagoID
-            });
+                var nuevoPago = await _pagosData.RegistrarPagoAsync(pago);
+
+                return File(
+                    fileContents: nuevoPago.Archivo,
+                    contentType: nuevoPago.TipoArchivo,
+                    fileDownloadName: nuevoPago.NombreArchivo
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error al registrar el pago.", error = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
