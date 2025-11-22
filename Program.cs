@@ -29,6 +29,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL")));
 
+var logoPath = Path.Combine(AppContext.BaseDirectory, "logo.png");
+builder.Services.AddScoped(provider => new ComprobantePdfService(logoPath));
 builder.Services.AddScoped<UsuariosData>();
 builder.Services.AddScoped<AvisosData>();
 builder.Services.AddScoped<PagosData>();

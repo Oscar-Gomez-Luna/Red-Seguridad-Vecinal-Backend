@@ -80,16 +80,16 @@ namespace MiApi.Data
                 .HasForeignKey(m => m.UsuarioID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Pago>()
-                .HasOne(p => p.CargoMantenimiento)
-                .WithMany(c => c.Pagos)
-                .HasForeignKey(p => p.CargoMantenimientoID)
+            modelBuilder.Entity<DetallePago>()
+                .HasOne(d => d.CargoMantenimiento)
+                .WithMany(c => c.DetallesPago)
+                .HasForeignKey(d => d.CargoMantenimientoID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Pago>()
-                .HasOne(p => p.CargoServicio)
-                .WithMany(c => c.Pagos)
-                .HasForeignKey(p => p.CargoServicioID)
+            modelBuilder.Entity<DetallePago>()
+                .HasOne(d => d.CargoServicio)
+                .WithMany(c => c.DetallesPago)
+                .HasForeignKey(d => d.CargoServicioID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Pago>()
