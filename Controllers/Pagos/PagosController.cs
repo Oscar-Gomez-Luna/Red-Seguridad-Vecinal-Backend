@@ -96,6 +96,61 @@ namespace Backend_RSV.Controllers.Pagos
             return Ok(result);
         }
 
+        [HttpGet("cargos/mantenimiento")]
+        public async Task<IActionResult> GetAllCargosMantenimiento()
+        {
+            var cargos = await _pagosData.GetAllCargosMantenimientoAsync();
+
+            var result = cargos.Select(c => new
+            {
+                cargoMantenimientoID = c.CargoMantenimientoID,
+                usuarioId = c.UsuarioID,
+                usuarioNombre = c.Usuario?.Persona.Nombre,
+                usuarioApellidoP = c.Usuario?.Persona.ApellidoPaterno,
+                usuarioApellidoM = c.Usuario?.Persona.ApellidoMaterno,
+                concepto = c.Concepto,
+                monto = c.Monto,
+                montoPagado = c.MontoPagado,
+                saldoPendiente = c.SaldoPendiente,
+                estado = c.Estado,
+                fechaVencimiento = c.FechaVencimiento,
+                fechaCreacion = c.FechaCreacion
+            });
+
+            return Ok(result);
+        }
+
+
+        [HttpGet("cargos/servicio")]
+        public async Task<IActionResult> GetAllCargosServicios()
+        {
+            var cargos = await _pagosData.GetAllCargosServiciosAsync();
+
+            var result = cargos.Select(c => new
+            {
+                cargoServicioID = c.CargoServicioID,
+
+                usuarioId = c.Solicitud.Usuario.UsuarioID,
+                usuarioNombre = c.Solicitud.Usuario.Persona.Nombre,
+                usuarioApellidoP = c.Solicitud.Usuario.Persona.ApellidoPaterno,
+                usuarioApellidoM = c.Solicitud.Usuario.Persona.ApellidoMaterno,
+                concepto = c.Concepto,
+                monto = c.Monto,
+                montoPagado = c.MontoPagado,
+                saldoPendiente = c.SaldoPendiente,
+                estado = c.Estado,
+                fechaCreacion = c.FechaCreacion,
+
+                solicitud = new
+                {
+                    c.Solicitud.SolicitudID,
+                    c.Solicitud.Descripcion
+                }
+            });
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> RegistrarPago([FromBody] PagoRegistroRequest request)
         {
@@ -159,6 +214,13 @@ namespace Backend_RSV.Controllers.Pagos
             return Ok(pago);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ObtenerTodosLosPagos()
+        {
+            var pagos = await _pagosData.ObtenerTodosLosPagosAsync();
+            return Ok(pagos);
+        }
+
         [HttpGet("usuario/{id}")]
         public async Task<IActionResult> ObtenerPagosPorUsuario(int id)
         {
@@ -176,5 +238,22 @@ namespace Backend_RSV.Controllers.Pagos
 
             return File(comprobante.Archivo, comprobante.TipoArchivo, comprobante.NombreArchivo);
         }
+        [HttpGet("comprobantes")]
+        public async Task<IActionResult> ObtenerTodosLosComprobantes()
+        {
+            var comprobantes = await _pagosData.ObtenerTodosLosComprobantesAsync();
+
+            var result = comprobantes.Select(c => new
+            {
+                c.ComprobanteID,
+                c.PagoID,
+                c.NombreArchivo,
+                c.TipoArchivo,
+                Tamaño = c.Archivo?.Length
+            });
+
+            return Ok(result);
+        }
+
     }
 }

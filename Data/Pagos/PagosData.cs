@@ -40,6 +40,24 @@ namespace Backend_RSV.Controllers.Pagos
                 .OrderBy(c => c.FechaCreacion)
                 .ToListAsync();
         }
+        public async Task<List<CargoMantenimiento>> GetAllCargosMantenimientoAsync()
+        {
+            return await _context.CargosMantenimiento
+                .Include(c => c.Usuario)
+                    .ThenInclude(u => u.Persona)
+                .OrderBy(c => c.FechaVencimiento)
+                .ToListAsync();
+        }
+
+        public async Task<List<CargoServicio>> GetAllCargosServiciosAsync()
+        {
+            return await _context.CargosServicios
+                .Include(c => c.Solicitud)
+                    .ThenInclude(s => s.Usuario)
+                        .ThenInclude(u => u.Persona)
+                .OrderBy(c => c.FechaCreacion)
+                .ToListAsync();
+        }
         public async Task<List<CargoMantenimiento>> GetByUsuarioIdCargoMantenimientoAsync(int usuarioId)
         {
             return await _context.CargosMantenimiento
@@ -193,6 +211,56 @@ namespace Backend_RSV.Controllers.Pagos
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<PagoDto>> ObtenerTodosLosPagosAsync()
+        {
+            return await _context.Pagos
+                .Select(p => new PagoDto
+                {
+                    PagoID = p.PagoID,
+                    FolioUnico = p.FolioUnico,
+                    MontoTotal = p.MontoTotal,
+                    TipoPago = p.TipoPago,
+                    MetodoPago = p.MetodoPago,
+                    FechaPago = p.FechaPago,
+                    UltimosDigitosTarjeta = p.UltimosDigitosTarjeta,
+
+                    // Usuario
+                    Usuario = new UsuarioDto
+                    {
+                        UsuarioID = p.Usuario.UsuarioID,
+                        Correo = p.Usuario.Persona.Email,
+
+                        Persona = p.Usuario.Persona == null ? null : new PersonaDto
+                        {
+                            PersonaID = p.Usuario.Persona.PersonaID,
+                            Nombre = p.Usuario.Persona.Nombre,
+                            ApellidoPaterno = p.Usuario.Persona.ApellidoPaterno,
+                            ApellidoMaterno = p.Usuario.Persona.ApellidoMaterno
+                        }
+                    },
+
+                    // Comprobante
+                    Comprobante = p.Comprobante == null ? null : new ComprobanteDto
+                    {
+                        ComprobantePagoID = p.Comprobante.ComprobanteID,
+                        NombreArchivo = p.Comprobante.NombreArchivo,
+                        TipoArchivo = p.Comprobante.TipoArchivo
+                    },
+
+                    // Detalles de pago
+                    DetallesPago = p.DetallesPago.Select(d => new DetallePagoDto
+                    {
+                        DetalleID = d.DetalleID,
+                        MontoAplicado = d.MontoAplicado,
+                        FechaAplicacion = d.FechaAplicacion,
+                        CargoMantenimientoID = d.CargoMantenimientoID,
+                        CargoServicioID = d.CargoServicioID
+                    }).ToList()
+                })
+                .ToListAsync();
+        }
+
+
         public async Task<IEnumerable<PagoDto>> ObtenerPagosPorUsuarioAsync(int usuarioId)
         {
             return await _context.Pagos
@@ -220,6 +288,11 @@ namespace Backend_RSV.Controllers.Pagos
         {
             return await _context.ComprobantesPago
                 .FirstOrDefaultAsync(c => c.PagoID == pagoId);
+        }
+
+        public async Task<List<ComprobantePago>> ObtenerTodosLosComprobantesAsync()
+        {
+            return await _context.ComprobantesPago.ToListAsync();
         }
     }
 }
