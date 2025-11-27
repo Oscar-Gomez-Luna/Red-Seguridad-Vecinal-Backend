@@ -488,3 +488,4 @@ firebase-credentials/
 firebase-adminsdk.json
 firebase-key.json
 appsettings.json
+.vscode

@@ -76,10 +76,10 @@ if (app.Environment.IsDevelopment())
         db.Database.Migrate();
     }
     app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors("NuevaPolitica");
 app.UseAuthorization();
