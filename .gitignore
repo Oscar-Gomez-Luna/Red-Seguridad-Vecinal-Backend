@@ -486,3 +486,4 @@ $RECYCLE.BIN/
 appsettings.Development.json
 firebase-adminsdk.json
 firebase-key.json
+.vscode
