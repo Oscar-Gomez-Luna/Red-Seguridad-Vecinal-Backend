@@ -316,22 +316,26 @@ public class ComprobantePdfService
         // Calcular totales para ESTE comprobante específico
         decimal pagoRealizadoAhora = pago.MontoTotal;
         decimal saldoPendienteTotal = 0;
-        decimal saldoPendienteAntes = 0;
+        decimal montoOriginalTotal = 0;
 
         foreach (var d in detalles)
         {
             if (d.CargoMantenimiento is not null)
             {
+                // Para mantenimiento: saldo pendiente DESPUÉS del pago + lo que se pagó ahora = total original
                 saldoPendienteTotal += d.CargoMantenimiento.SaldoPendiente;
-                saldoPendienteAntes += d.CargoMantenimiento.SaldoPendiente + d.MontoAplicado;
+                montoOriginalTotal += d.CargoMantenimiento.SaldoPendiente + d.MontoAplicado;
             }
             else if (d.CargoServicio is not null)
             {
-                saldoPendienteAntes += d.MontoAplicado;
+                // Para servicio: saldo pendiente DESPUÉS del pago + lo que se pagó ahora = total original
+                saldoPendienteTotal += d.CargoServicio.SaldoPendiente;
+                montoOriginalTotal += d.CargoServicio.SaldoPendiente + d.MontoAplicado;
             }
         }
 
-        decimal totalAPagar = saldoPendienteTotal > 0 ? saldoPendienteAntes : pagoRealizadoAhora;
+        // Si no hay saldo pendiente, significa que se pagó todo
+        decimal totalAPagar = montoOriginalTotal > 0 ? montoOriginalTotal : pagoRealizadoAhora;
         decimal restante = saldoPendienteTotal;
 
         string estado = restante > 0 ? "PENDIENTE" : "PAGADO";
@@ -346,7 +350,6 @@ public class ComprobantePdfService
         resumenTable.AddCell(CreateTableCell(estado, fontEstado, Element.ALIGN_CENTER, false));
 
         document.Add(resumenTable);
-
         // INFORMACIÓN ADICIONAL
         document.Add(new Paragraph("INFORMACIÓN ADICIONAL", fontSectionTitle)
         {

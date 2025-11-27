@@ -148,6 +148,42 @@ namespace Backend_RSV.Data.Usuarios
                 .Include(u => u.CuentaUsuario)
                 .ToListAsync();
         }
+        public async Task<bool> DesactivarUsuarioAsync(int usuarioId, string? motivo)
+        {
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.UsuarioID == usuarioId);
+
+            if (usuario == null || usuario.Activo == false)
+                return false;
+
+            usuario.Activo = false;
+            usuario.MotivoDesactivar = motivo;
+            usuario.UltimoAcceso = DateTime.Now;
+
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> ReactivarUsuarioAsync(int usuarioId)
+        {
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.UsuarioID == usuarioId);
+
+            if (usuario == null || usuario.Activo == true)
+                return false;
+
+            usuario.Activo = true;
+            usuario.MotivoDesactivar = null;
+            usuario.UltimoAcceso = DateTime.Now;
+
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
 
         public async Task<Usuario?> GetUsuarioByIdAsync(int id)
         {

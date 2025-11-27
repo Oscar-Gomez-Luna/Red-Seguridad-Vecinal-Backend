@@ -202,16 +202,70 @@ namespace Backend_RSV.Controllers.Usuarios
             return Ok(usuarios.Select(u => new
             {
                 u.UsuarioID,
-                u.Persona.Nombre,
-                u.Persona.ApellidoPaterno,
-                u.Persona.ApellidoMaterno,
-                u.Persona.Email,
+                nombre = u.Persona.Nombre,
+                apellidoPaterno = u.Persona.ApellidoPaterno,
+                apellidoMaterno = u.Persona.ApellidoMaterno,
+                email = u.Persona.Email,
+                telefono = u.Persona.Telefono,
+                numeroCasa = u.NumeroCasa,
+                calle = u.Calle,
+                fechaNacimiento = u.Persona.FechaNacimiento,
                 tipoUsuario = u.TipoUsuario.Nombre,
-                u.CuentaUsuario?.NumeroTarjeta,
-                u.CuentaUsuario?.UltimosDigitos,
-                u.CuentaUsuario?.FechaVencimiento,
+                numeroTarjeta = u.CuentaUsuario?.NumeroTarjeta,
+                ultimosDigitos = u.CuentaUsuario?.UltimosDigitos,
+                fechaVencimiento = u.CuentaUsuario?.FechaVencimiento,
                 u.Activo
             }));
+        }
+
+        [HttpPut("desactivar/{id}")]
+        public async Task<IActionResult> DesactivarUsuario(int id, [FromBody] DesactivarUsuarioRequest request)
+        {
+            if (id <= 0)
+                return BadRequest(new { mensaje = "ID inválido." });
+
+            try
+            {
+                bool desactivado = await _usuariosData.DesactivarUsuarioAsync(id, request.Motivo);
+
+                if (!desactivado)
+                    return NotFound(new { mensaje = "Usuario no encontrado o ya está desactivado." });
+
+                return Ok(new { mensaje = "Usuario desactivado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    mensaje = "Error interno del servidor.",
+                    detalle = ex.Message
+                });
+            }
+        }
+
+        [HttpPut("reactivar/{id}")]
+        public async Task<IActionResult> ReactivarUsuario(int id)
+        {
+            if (id <= 0)
+                return BadRequest(new { mensaje = "ID inválido." });
+
+            try
+            {
+                bool reactivado = await _usuariosData.ReactivarUsuarioAsync(id);
+
+                if (!reactivado)
+                    return NotFound(new { mensaje = "Usuario no encontrado o ya está activo." });
+
+                return Ok(new { mensaje = "Usuario reactivado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    mensaje = "Error interno del servidor.",
+                    detalle = ex.Message
+                });
+            }
         }
 
         [HttpGet("{id}")]
