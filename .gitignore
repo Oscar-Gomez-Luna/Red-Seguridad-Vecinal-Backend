@@ -484,5 +484,6 @@ $RECYCLE.BIN/
 *.swp
 
 appsettings.Development.json
+firebase-credentials/
 firebase-adminsdk.json
 firebase-key.json

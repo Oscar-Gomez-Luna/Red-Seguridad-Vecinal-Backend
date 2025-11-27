@@ -29,6 +29,7 @@ namespace MiApi.Data
         public DbSet<CargoServicio> CargosServicios { get; set; }
         public DbSet<Pago> Pagos { get; set; }
         public DbSet<DetallePago> DetallePago { get; set; }
+        public DbSet<ComprobantePago> ComprobantesPago { get; set; }
         public DbSet<MarcadorMapa> MarcadoresMapa { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -79,11 +80,23 @@ namespace MiApi.Data
                 .HasForeignKey(m => m.UsuarioID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Pago>()
-                .HasOne(p => p.CargoMantenimiento)
-                .WithMany(c => c.Pagos)
-                .HasForeignKey(p => p.CargoMantenimientoID)
+            modelBuilder.Entity<DetallePago>()
+                .HasOne(d => d.CargoMantenimiento)
+                .WithMany(c => c.DetallesPago)
+                .HasForeignKey(d => d.CargoMantenimientoID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DetallePago>()
+                .HasOne(d => d.CargoServicio)
+                .WithMany(c => c.DetallesPago)
+                .HasForeignKey(d => d.CargoServicioID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Pago>()
+                .HasOne(p => p.Comprobante)
+                .WithOne(c => c.Pago)
+                .HasForeignKey<ComprobantePago>(c => c.PagoID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<TipoUsuario>()
                 .HasIndex(t => t.Nombre)

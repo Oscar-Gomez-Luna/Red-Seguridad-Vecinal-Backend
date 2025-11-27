@@ -27,14 +27,15 @@ public class CargoServicio
     public decimal MontoPagado { get; set; } = 0.00m;
 
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public decimal SaldoPendiente { get; private set; }
+    public decimal SaldoPendiente { get; private set; } = 0m;
 
     public DateTime FechaCreacion { get; set; } = DateTime.Now;
 
-    // Navigation properties
     [ForeignKey("UsuarioID")]
     public virtual Usuario Usuario { get; set; } = null!;
 
     [ForeignKey("SolicitudID")]
     public virtual SolicitudesServicio Solicitud { get; set; } = null!;
+
+    public virtual ICollection<DetallePago> DetallesPago { get; set; } = new List<DetallePago>();
 }

@@ -24,10 +24,15 @@ public class Reserva
     [StringLength(500)]
     public string? Motivo { get; set; }
 
+    [Required]
+    [StringLength(20)]
+    public string Estado { get; set; } = "Pendiente";
+
     public DateTime FechaCreacion { get; set; } = DateTime.Now;
 
     // Navigation properties
     [ForeignKey("UsuarioID")]
+
     public virtual Usuario Usuario { get; set; } = null!;
 
     [ForeignKey("AmenidadID")]
