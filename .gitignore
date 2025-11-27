@@ -487,3 +487,4 @@ appsettings.Development.json
 firebase-credentials/
 firebase-adminsdk.json
 firebase-key.json
+appsettings.json
