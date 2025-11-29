@@ -51,6 +51,14 @@ builder.Services.AddScoped<AmenidadesData>();
 builder.Services.AddSingleton<IAlertasTrackingService, AlertasTrackingService>();
 builder.Services.AddHostedService(sp => (AlertasTrackingService)sp.GetRequiredService<IAlertasTrackingService>());
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("NuevaPolitica", app =>
+    {
+        app.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 
 var app = builder.Build();
 
@@ -66,8 +74,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseCors("NuevaPolitica");
 app.MapControllers();
 
 app.Run();
