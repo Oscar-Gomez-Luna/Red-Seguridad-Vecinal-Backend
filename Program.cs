@@ -83,5 +83,6 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors("NuevaPolitica");
 app.UseAuthorization();
+app.UseCors("NuevaPolitica");
 app.MapControllers();
 app.Run();

@@ -88,10 +88,11 @@ namespace Backend_RSV.Data.Servicios
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<PersonalMantenimientoDTO>> GetPersonalMantenimientoAsync()
+                public async Task<List<PersonalMantenimientoDTO>> GetPersonalMantenimientoAsync()
         {
             return await _context.PersonalMantenimiento
                 .Where(p => p.Activo)
+                .Include(p => p.Persona) // Incluir datos de persona
                 .Select(p => new PersonalMantenimientoDTO
                 {
                     PersonalMantenimientoID = p.PersonalMantenimientoID,
@@ -105,7 +106,15 @@ namespace Backend_RSV.Data.Servicios
                     Activo = p.Activo,
                     Notas = p.Notas,
                     NombrePersona = p.Persona.Nombre + " " + p.Persona.ApellidoPaterno,
-                    TelefonoPersona = p.Persona.Telefono
+                    TelefonoPersona = p.Persona.Telefono ?? "",
+                    EmailPersona = p.Persona.Email,
+                    // Datos completos de persona
+                    Nombre = p.Persona.Nombre,
+                    ApellidoPaterno = p.Persona.ApellidoPaterno,
+                    ApellidoMaterno = p.Persona.ApellidoMaterno,
+                    Telefono = p.Persona.Telefono,
+                    Email = p.Persona.Email,
+                    FechaNacimiento = p.Persona.FechaNacimiento
                 })
                 .ToListAsync();
         }
@@ -114,6 +123,7 @@ namespace Backend_RSV.Data.Servicios
         {
             return await _context.PersonalMantenimiento
                 .Where(p => p.PersonalMantenimientoID == id && p.Activo)
+                .Include(p => p.Persona)
                 .Select(p => new PersonalMantenimientoDTO
                 {
                     PersonalMantenimientoID = p.PersonalMantenimientoID,
@@ -127,11 +137,141 @@ namespace Backend_RSV.Data.Servicios
                     Activo = p.Activo,
                     Notas = p.Notas,
                     NombrePersona = p.Persona.Nombre + " " + p.Persona.ApellidoPaterno,
-                    TelefonoPersona = p.Persona.Telefono,
-                    EmailPersona = p.Persona.Email
+                    TelefonoPersona = p.Persona.Telefono ?? "",
+                    EmailPersona = p.Persona.Email,
+                    // Datos completos de persona
+                    Nombre = p.Persona.Nombre,
+                    ApellidoPaterno = p.Persona.ApellidoPaterno,
+                    ApellidoMaterno = p.Persona.ApellidoMaterno,
+                    Telefono = p.Persona.Telefono,
+                    Email = p.Persona.Email,
+                    FechaNacimiento = p.Persona.FechaNacimiento
                 })
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<PersonalMantenimiento> CreatePersonalMantenimientoAsync(PersonalMantenimientoRequest request)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            
+            try
+            {
+                var persona = new Persona
+                {
+                    Nombre = request.Nombre,
+                    ApellidoPaterno = request.ApellidoPaterno,
+                    ApellidoMaterno = request.ApellidoMaterno,
+                    Telefono = request.Telefono,
+                    Email = request.Email,
+                    FechaNacimiento = request.FechaNacimiento,
+                    FechaRegistro = DateTime.Now
+                };
+
+                _context.Personas.Add(persona);
+                await _context.SaveChangesAsync();
+
+                var personal = new PersonalMantenimiento
+                {
+                    PersonaID = persona.PersonaID,
+                    Puesto = request.Puesto,
+                    FechaContratacion = request.FechaContratacion,
+                    Sueldo = request.Sueldo,
+                    TipoContrato = request.TipoContrato,
+                    Turno = request.Turno,
+                    DiasLaborales = request.DiasLaborales,
+                    Notas = request.Notas,
+                    Activo = true
+                };
+
+                _context.PersonalMantenimiento.Add(personal);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return personal;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+                public async Task<PersonalMantenimiento?> UpdatePersonalMantenimientoAsync(int id, UpdatePersonalMantenimientoRequest request)
+        {
+            var personal = await _context.PersonalMantenimiento
+                .FirstOrDefaultAsync(p => p.PersonalMantenimientoID == id);
+
+            if (personal == null) return null;
+
+            if (!string.IsNullOrEmpty(request.Puesto))
+                personal.Puesto = request.Puesto;
+
+            if (request.FechaContratacion.HasValue)
+                personal.FechaContratacion = request.FechaContratacion.Value;
+
+            if (request.Sueldo.HasValue)
+                personal.Sueldo = request.Sueldo.Value;
+
+            if (request.TipoContrato != null)
+                personal.TipoContrato = request.TipoContrato;
+
+            if (request.Turno != null)
+                personal.Turno = request.Turno;
+
+            if (request.DiasLaborales != null)
+                personal.DiasLaborales = request.DiasLaborales;
+
+            if (request.Notas != null)
+                personal.Notas = request.Notas;
+
+            if (request.Activo.HasValue)
+                personal.Activo = request.Activo.Value;
+
+            await _context.SaveChangesAsync();
+            return personal;
+        }
+
+        public async Task<PersonalMantenimiento?> UpdatePersonalMantenimientoCompletoAsync(int id, PersonalMantenimientoRequest request)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            
+            try
+            {
+                var personal = await _context.PersonalMantenimiento
+                    .Include(p => p.Persona)
+                    .FirstOrDefaultAsync(p => p.PersonalMantenimientoID == id);
+
+                if (personal == null) return null;
+
+                // Actualizar datos de la persona
+                personal.Persona.Nombre = request.Nombre;
+                personal.Persona.ApellidoPaterno = request.ApellidoPaterno;
+                personal.Persona.ApellidoMaterno = request.ApellidoMaterno;
+                personal.Persona.Telefono = request.Telefono;
+                personal.Persona.Email = request.Email;
+                personal.Persona.FechaNacimiento = request.FechaNacimiento;
+
+                // Actualizar datos del personal
+                personal.Puesto = request.Puesto;
+                personal.FechaContratacion = request.FechaContratacion;
+                personal.Sueldo = request.Sueldo;
+                personal.TipoContrato = request.TipoContrato;
+                personal.Turno = request.Turno;
+                personal.DiasLaborales = request.DiasLaborales;
+                personal.Notas = request.Notas;
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return personal;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
 
         public async Task<List<SolicitudServicioDTO>> GetSolicitudesAsync()
         {
@@ -416,26 +556,6 @@ namespace Backend_RSV.Data.Servicios
             servicio.Disponible = disponible;
             await _context.SaveChangesAsync();
             return servicio;
-        }
-
-        public async Task<PersonalMantenimiento> CreatePersonalMantenimientoAsync(PersonalMantenimientoRequest request)
-        {
-            var personal = new PersonalMantenimiento
-            {
-                PersonaID = request.PersonaID,
-                Puesto = request.Puesto,
-                FechaContratacion = request.FechaContratacion,
-                Sueldo = request.Sueldo,
-                TipoContrato = request.TipoContrato,
-                Turno = request.Turno,
-                DiasLaborales = request.DiasLaborales,
-                Notas = request.Notas,
-                Activo = true
-            };
-
-            _context.PersonalMantenimiento.Add(personal);
-            await _context.SaveChangesAsync();
-            return personal;
         }
 
         public async Task<SolicitudesServicio> CreateSolicitudAsync(SolicitudServicioRequest request)

@@ -18,17 +18,50 @@ namespace Backend_RSV.Models.Request
         public bool Disponible { get; set; }
     }
 
-    public class PersonalMantenimientoRequest
-    {
-        public int PersonaID { get; set; }
-        public string Puesto { get; set; } = string.Empty;
-        public DateOnly FechaContratacion { get; set; }
-        public decimal Sueldo { get; set; }
-        public string? TipoContrato { get; set; }
-        public string? Turno { get; set; }
-        public string? DiasLaborales { get; set; }
-        public string? Notas { get; set; }
-    }
+// En Backend_RSV.Models.Request
+public class PersonalMantenimientoRequest
+{
+    // Datos de la persona
+    public string Nombre { get; set; } = string.Empty;
+
+    public string ApellidoPaterno { get; set; } = string.Empty;
+
+    public string? ApellidoMaterno { get; set; }
+
+    public string Telefono { get; set; } = string.Empty;
+
+    public string? Email { get; set; }
+
+    public DateOnly? FechaNacimiento { get; set; }
+    
+    // Datos del personal de mantenimiento
+    public string Puesto { get; set; } = string.Empty;
+
+    public DateOnly FechaContratacion { get; set; }
+
+    public decimal Sueldo { get; set; }
+
+    public string? TipoContrato { get; set; }
+
+    public string? Turno { get; set; }
+
+    public string? DiasLaborales { get; set; }
+
+    public string? Notas { get; set; }
+}
+
+public class UpdatePersonalMantenimientoRequest
+{
+    // Solo campos que se puedan modificar (no incluye datos de persona)
+    public string? Puesto { get; set; }
+    public DateOnly? FechaContratacion { get; set; }
+    public decimal? Sueldo { get; set; }
+    public string? TipoContrato { get; set; }
+    public string? Turno { get; set; }
+    public string? DiasLaborales { get; set; }
+    public string? Notas { get; set; }
+    public bool? Activo { get; set; }
+}
 
     public class SolicitudServicioRequest
     {
