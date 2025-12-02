@@ -99,8 +99,45 @@ namespace Backend_RSV.Controllers
         [HttpPost("personal-mantenimiento")]
         public async Task<IActionResult> CreatePersonalMantenimiento([FromBody] PersonalMantenimientoRequest request)
         {
-            var personal = await _serviciosData.CreatePersonalMantenimientoAsync(request);
-            return Ok(new { message = "Personal registrado exitosamente", id = personal.PersonalMantenimientoID });
+            try
+            {
+                var personal = await _serviciosData.CreatePersonalMantenimientoAsync(request);
+                return Ok(new { 
+                    message = "Personal registrado exitosamente", 
+                    id = personal.PersonalMantenimientoID 
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al crear el personal: " + ex.Message });
+            }
+        }
+
+         [HttpPatch("personal-mantenimiento/{id}")]
+        public async Task<IActionResult> UpdatePersonalMantenimiento(int id, [FromBody] UpdatePersonalMantenimientoRequest request)
+        {
+            var personal = await _serviciosData.UpdatePersonalMantenimientoAsync(id, request);
+            if (personal == null)
+                return NotFound(new { message = "Personal no encontrado" });
+
+            return Ok(new { message = "Personal actualizado exitosamente" });
+        }
+
+        [HttpPut("personal-mantenimiento/{id}/completo")]
+        public async Task<IActionResult> UpdatePersonalMantenimientoCompleto(int id, [FromBody] PersonalMantenimientoRequest request)
+        {
+            try
+            {
+                var personal = await _serviciosData.UpdatePersonalMantenimientoCompletoAsync(id, request);
+                if (personal == null)
+                    return NotFound(new { message = "Personal no encontrado" });
+
+                return Ok(new { message = "Personal actualizado exitosamente" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al actualizar el personal: " + ex.Message });
+            }
         }
 
 
