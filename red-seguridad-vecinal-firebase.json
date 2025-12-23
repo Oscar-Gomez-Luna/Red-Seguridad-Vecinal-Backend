@@ -1,0 +1,22 @@
+{
+  "alertas_panico": {
+    "id_alerta_ejemplo": {
+      "estatus": "",
+      "nombre_usuario": "",
+      "timestamp": 0,
+      "ubicacion": {
+        "lat": 0,
+        "lng": 0
+      },
+      "uid": ""
+    }
+  },
+  "mensajes_chat": {
+    "id_mensaje_ejemplo": {
+      "mensaje": "Bienvenidos a Red de Seguridad Vecinal",
+      "nombre_usuario": "Red de Seguridad Vecinal",
+      "timestamp": 0,
+      "uid": ""
+    }
+  }
+}
