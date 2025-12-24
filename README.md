@@ -1,4 +1,21 @@
-# Desarrollo-Movil_Gestion-Vecinal
+# Desarrollo-Movil Gestion Vecinal
+
+API RESTful monolítica desarrollada en **ASP.NET Core 7.0** que gestiona toda la lógica de negocio del ecosistema de seguridad vecinal.
+
+## Partes del proyecto:
+* **Frontend:** https://github.com/Oscar-Gomez-Luna/Red-Seguridad-Vecinal-Frontend
+* **Apliación móvil:** https://github.com/IDGS-901-22002224/Desarrollo-Movil_Gestion-Vecinal
+
+## Tecnologías
+* **Framework:** ASP.NET Core 7.0
+* **Base de Datos:** Azure SQL  con Entity Framework y Firebase (pruebas en SQL Server)
+* **Seguridad:** JWT & Firebase Auth
+
+## Funcionalidades
+* **Gestión de Alertas:** Recepción y procesamiento de alertas de pánico en tiempo real.
+* **Control de Accesos:** Validación de códigos QR dinámicos.
+* **Finanzas:** Lógica para estados de cuenta y registro de pagos.
+* **Administración:** 11 Controladores para gestión de usuarios, zonas y servicios.
 
 | Actividad | Se utilizó | Descripción | Fecha |
 |-----------|------------|-------------|---------|
