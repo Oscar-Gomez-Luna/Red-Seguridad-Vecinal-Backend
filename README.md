@@ -6,6 +6,11 @@ API RESTful monolítica desarrollada en **ASP.NET Core 7.0** que gestiona toda l
 * **Frontend:** https://github.com/Oscar-Gomez-Luna/Red-Seguridad-Vecinal-Frontend
 * **Apliación móvil:** https://github.com/IDGS-901-22002224/Desarrollo-Movil_Gestion-Vecinal
 
+## Documentación del Proyecto
+Puedes consultar el documento técnico completo aquí:
+ **[Documento Final - Red de Seguridad Vecinal.pdf](https://github.com/Oscar-Gomez-Luna/Red-Seguridad-Vecinal-Frontend/blob/master/Documento%20Final%20-%20Red%20de%20Seguridad%20Vecinal.pdf)**
+
+
 ## Tecnologías
 * **Framework:** ASP.NET Core 7.0
 * **Base de Datos:** Azure SQL  con Entity Framework y Firebase (pruebas en SQL Server)
